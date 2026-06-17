@@ -1,10 +1,12 @@
 "use client";
+import { logout } from "@/components/LogoutButton/server";
 import { useStoryboard } from "@/components/StoryBoard/hooks";
 import { StoryBoardProvider } from "@/components/StoryBoard/provider";
 import { StoryPlanner } from "@/components/StoryPlanner";
 import { useCurrentUser } from "@/services/hooks/useCurrentUser";
 import { StoryboardScreen } from "@writersunblocked/ui";
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 import { ObserverProvider } from "./observer";
 import { StoryProvider, useStory } from "./provider";
 import { StoryContent } from "./story";
@@ -28,6 +30,28 @@ const StoryPageBody = () => {
   const { openBoard } = useStoryboard();
   const router = useRouter();
   const { user, stories } = useCurrentUser();
+
+  const handleClickMenu = useCallback(
+    async (entity: string, storyId?: string) => {
+      if (entity === "edit-story") {
+        router.push(`/story/${storyId}`);
+      } else if (entity === "return-to-dashboard") {
+        router.push("/");
+      } else if (entity === "story-settings") {
+        router.push(`/story/${storyId}/settings`);
+      } else if (entity === "manage-account") {
+        router.push("/account");
+      } else if (entity === "billing-plan") {
+        router.push("/billing");
+      } else if (entity === "whats-new") {
+        // router.push("/whats-new");
+      } else if (entity === "sign-out") {
+        await logout();
+        router.push("/");
+      }
+    },
+    [router]
+  );
 
   if (isLoading) {
     return null;
@@ -54,22 +78,18 @@ const StoryPageBody = () => {
       <Style.MainSideBar
         onBookmarkClick={() => openBoard()}
         user={user}
-        stories={stories?.map((s) => ({ id: s.id, title: s.title })) || []}
+        stories={stories}
+        currentStory={story}
         onLinkClick={(sceneId: string) =>
           router.push(`/story/${story?.id}#scene-${sceneId}`)
         }
         onAddScene={createSceneForOrganizer}
         onChange={handleSceneOrganizerChange}
         onSceneTitleChange={updateSceneLabel}
+        onClickMenu={handleClickMenu}
         scenes={editorScenes}
         value={sceneOrganizerValue}
         title={story?.title}
-        links={[
-          {
-            label: "Back to Dashboard",
-            onClick: () => router.push("/"),
-          },
-        ]}
       />
       <Style.SceneContainer>
         <StoryContent />

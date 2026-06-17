@@ -15,7 +15,9 @@
     "push": "prisma db push",
     "generate": "prisma generate",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "link:ui": "yalc add @the-hereafter-technologies/writersunblocked-ui && yarn install",
+    "unlink:ui": "yalc remove @the-hereafter-technologies/writersunblocked-ui && yarn install"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -28,7 +30,7 @@
     "@tiptap/react": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
     "@tiptap/suggestion": "^3.22.3",
-    "@writersunblocked/ui": "link:.yalc/@writersunblocked/ui",
+    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@^0.1.0",
     "colord": "^2.9.3",
     "lucide-react": "^1.8.0",
     "moment": "^2.30.1",

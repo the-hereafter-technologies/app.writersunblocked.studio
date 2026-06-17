@@ -26,7 +26,6 @@ export const ProjectsPage = async () => {
   if (!cookie || cookie.length === 0) {
     redirect("/login");
   }
-  console.log("cookie", cookie);
 
   const data = await nestApiRequest<Story[]>({
     path: "/stories",
