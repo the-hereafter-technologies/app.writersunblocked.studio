@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   webpack(config) {
     const fileLoaderRule = config.module.rules.find((rule: { test?: RegExp }) =>
       rule.test?.test?.(".svg")

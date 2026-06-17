@@ -284,12 +284,6 @@ export default function ScenesPanel({
         {scene.mentionCount} mentions
       </Meta>
 
-      {scene.chapters.length > 0 && (
-        <ChapterList>
-          Chapters: {scene.chapters.map((chapter) => chapter.title).join(", ")}
-        </ChapterList>
-      )}
-
       <NotesWrap>
         {scene.notes.length === 0 ? (
           <Muted>No notes yet.</Muted>

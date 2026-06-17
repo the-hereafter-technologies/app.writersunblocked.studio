@@ -1,9 +1,9 @@
 "use client";
+import { useModal } from "@writersunblocked/ui";
 import moment from "moment";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { useModal } from "../Modal/hooks";
 import { DeleteProject } from "./delete-project";
 import * as Style from "./style";
 
@@ -43,11 +43,12 @@ export const ProjectItem = ({
     [lastEdited]
   );
 
-  const { openModal, closeModal } = useModal();
+  const { open, close, render } = useModal();
 
   const handleDelete = useCallback(() => {
-    openModal(<DeleteProject storyId={storyId} onClose={closeModal} />);
-  }, [openModal, closeModal, storyId]);
+    render(<DeleteProject storyId={storyId} onClose={close} />);
+    open();
+  }, [render, open, close, storyId]);
 
   return (
     <Style.Container>

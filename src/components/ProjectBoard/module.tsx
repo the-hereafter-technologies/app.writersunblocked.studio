@@ -65,10 +65,8 @@ export const ProjectBoard = () => {
             </Style.SceneSettings>
             {story && (
               <DangerZoneInput
-                story={{
-                  title: story.title,
-                  id: story.id,
-                }}
+                // @ts-expect-error - fixed in @writersunblocked/ui@0.4.0
+                story={story}
                 onSubmit={handleDeleteStory}
               />
             )}

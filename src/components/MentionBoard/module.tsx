@@ -1,5 +1,5 @@
 import { useStory } from "@/containers/StoryPage";
-import { MentionOrganizer, MentionPanel } from "@writersunblocked/ui";
+import { MentionOrganizer } from "@writersunblocked/ui";
 import * as Style from "./style";
 
 export type MentionBoardProps = {
@@ -31,9 +31,6 @@ export const MentionBoard = ({ mentionId }: MentionBoardProps) => {
           </Style.EmptyState>
         )} */}
       </Style.StoryMentions>
-      <Style.StoryMention>
-        {mention && <MentionPanel mention={mention} />}
-      </Style.StoryMention>
     </Style.Container>
   );
 };

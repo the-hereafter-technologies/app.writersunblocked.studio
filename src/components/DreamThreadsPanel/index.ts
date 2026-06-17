@@ -1,1 +1,0 @@
-export { DreamThreadsPanel } from "./module";

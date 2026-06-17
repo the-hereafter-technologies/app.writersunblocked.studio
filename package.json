@@ -30,7 +30,7 @@
     "@tiptap/react": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
     "@tiptap/suggestion": "^3.22.3",
-    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@^0.1.0",
+    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@^0.3.0",
     "colord": "^2.9.3",
     "lucide-react": "^1.8.0",
     "moment": "^2.30.1",

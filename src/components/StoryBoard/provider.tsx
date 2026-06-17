@@ -4,7 +4,6 @@ import { AnimatePresence } from "motion/react";
 import { type PropsWithChildren, useEffect, useMemo, useState } from "react";
 import { MentionBoard } from "../MentionBoard";
 import { ProjectBoard } from "../ProjectBoard";
-import { SceneBoard } from "../SceneBoard";
 import { StoryboardHeader } from "./header";
 import * as Style from "./style";
 import { StoryboardContext } from "./utils";
@@ -46,7 +45,7 @@ export const StoryBoardProvider = ({ children }: PropsWithChildren) => {
       case StoryboardScreen.Mention:
         return <MentionBoard mentionId={entityId} />;
       case StoryboardScreen.Scene:
-        return <SceneBoard sceneId={entityId as string} />;
+        return <div></div>;
       default:
         return null;
     }

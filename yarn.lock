@@ -3997,7 +3997,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     "@types/styled-components": "npm:^5.1.36"
-    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@^0.1.0"
+    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@^0.3.0"
     colord: "npm:^2.9.3"
     lucide-react: "npm:^1.8.0"
     moment: "npm:^2.30.1"
@@ -4018,9 +4018,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@writersunblocked/ui@npm:@the-hereafter-technologies/writersunblocked-ui@^0.1.0":
-  version: 0.1.0
-  resolution: "@the-hereafter-technologies/writersunblocked-ui@npm:0.1.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40the-hereafter-technologies%2Fwritersunblocked-ui%2F0.1.0%2F75e060a8a147764fa03dcec6421d99023fb697a9"
+"@writersunblocked/ui@npm:@the-hereafter-technologies/writersunblocked-ui@^0.3.0":
+  version: 0.3.0
+  resolution: "@the-hereafter-technologies/writersunblocked-ui@npm:0.3.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40the-hereafter-technologies%2Fwritersunblocked-ui%2F0.3.0%2Fce5777d3b91117de014f8bfbb11c0f0a22df76fa"
   dependencies:
     "@dnd-kit/react": "npm:^0.5.0"
     "@hookform/resolvers": "npm:^5.2.2"
@@ -4041,7 +4041,7 @@ __metadata:
     next: ">=14"
     react: ">=18"
     react-dom: ">=18"
-  checksum: 10c0/1e41232b4f8522c26f959405bc09d44ad64e860164e28604acad19f5c7f3b3cf2e467793adbb48c287c90070bddffd4c0e66f0137b4a42e5d1834a34fcae4444
+  checksum: 10c0/93cd77f89228160cd7904a274de87755527702a7fd6ccce361c8963e0ff2f33e0a9b8a99316307cee4f5799c905f354c79ecf4f353d66b8a6339d644f4887321
   languageName: node
   linkType: hard
 

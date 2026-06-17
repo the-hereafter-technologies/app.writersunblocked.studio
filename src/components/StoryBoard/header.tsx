@@ -1,10 +1,13 @@
 "use client";
 import { useStory } from "@/containers/StoryPage";
 import { useCurrentUser } from "@/services/hooks/useCurrentUser";
-import { StoryboardNavigator } from "@writersunblocked/ui";
+import {
+  StoryboardNavigator,
+  type StoryboardScreen,
+} from "@writersunblocked/ui";
 import { useStoryboard } from "./hooks";
 import * as Styled from "./style";
-export const StoryboardHeader = ({ screen }: { screen: string }) => {
+export const StoryboardHeader = ({ screen }: { screen: StoryboardScreen }) => {
   const { story } = useStory();
   const { closeBoard, openBoard } = useStoryboard();
   const { user } = useCurrentUser();
