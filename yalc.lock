@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "@writersunblocked/ui": {
+      "signature": "87f49e07f6eac69250fb0c9b22080c40",
+      "link": true
+    }
+  }
+}
