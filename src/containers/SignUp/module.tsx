@@ -3,7 +3,7 @@ import { AppFooter } from "@/components/AppFooter";
 import { Chip } from "@/components/Chip";
 import { OnboardingSection } from "@/components/OnboardingSection";
 import { SelectInput } from "@/components/SelectInput";
-import { TextInput } from "@/components/TextInput";
+import { Input, InputType } from "@writersunblocked/ui/app";
 import { useRef, useState } from "react";
 import { schema } from "./schema";
 import * as Style from "./style";
@@ -57,7 +57,8 @@ export const SignUp = () => {
           validateBeforeContinue={["name", "handle"]}
         >
           <div className="is-available">
-            <TextInput
+            <Input
+              type={InputType.TEXT}
               name="handle"
               label="Choose a handle"
               placeholder="Your unique handle (i.e., @thewritingchampion74)"

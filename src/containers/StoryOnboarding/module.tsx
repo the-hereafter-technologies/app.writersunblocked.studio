@@ -1,6 +1,6 @@
 "use client";
 import { OnboardingSection } from "@/components/OnboardingSection";
-import { ChipSelectInput, Input, InputType } from "@writersunblocked/ui";
+import { ChipSelectInput, Input, InputType } from "@writersunblocked/ui/app";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 // import { TextInput } from "@/components/TextInput";

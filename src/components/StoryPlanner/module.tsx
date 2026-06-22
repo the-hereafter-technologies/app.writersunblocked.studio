@@ -1,15 +1,16 @@
 "use client";
 import { useStory } from "@/containers/StoryPage";
-import type { PlatformActionItem } from "@/services/api/story";
 import { skipStoryOnboarding } from "@/services/api/skipStoryOnboarding";
+import type { PlatformActionItem } from "@/services/api/story";
 import { useCurrentUser } from "@/services/hooks/useCurrentUser";
 import {
   Accordion,
   AccordionItem,
-  PlatformPostItem,
   PlatformAction,
+  PlatformPostItem,
+  type PlatformPostField,
   StoryboardStarter,
-} from "@writersunblocked/ui";
+} from "@writersunblocked/ui/app";
 import {
   type PropsWithChildren,
   useCallback,
@@ -17,14 +18,19 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  applyPlatformAction,
+  canApplyPlatformAction,
+  getPlatformActionKey,
+} from "./apply-platform-action";
 import { PlannerProvider } from "./provider";
 import * as Style from "./style";
 import { useStoryPlanner } from "./utils";
 
-export type StoryPlannerProps = {
+export type StoryPlannerProps = PropsWithChildren<{
   storyId: string;
   onCompleted: () => Promise<void> | void;
-};
+}>;
 
 const toPlatformAction = (action: string): PlatformAction => {
   switch (action) {
@@ -40,26 +46,34 @@ const toPlatformAction = (action: string): PlatformAction => {
   }
 };
 
-const StoryPlannerLayout = ({ children }: PropsWithChildren) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+type StoryPlannerLayoutProps = PropsWithChildren<{
+  onCompleted: () => Promise<void> | void;
+}>;
 
-  const {
-    analysis,
-    analysisLoading,
-    submitting,
-    awaitingCompletion,
-    error,
-    canGenerate,
-    interrogation,
-    setDraft,
-    generateStoryboard,
-  } = useStoryPlanner();
-  const { story } = useStory();
+const StoryPlannerLayout = ({
+  children,
+  onCompleted,
+}: StoryPlannerLayoutProps) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [acceptedActionKeys, setAcceptedActionKeys] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [addingActionKey, setAddingActionKey] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [isContinuing, setIsContinuing] = useState(false);
+
+  const pendingCompleteRef = useRef(false);
+  const skipRequestedRef = useRef(false);
+  const sceneOrderRef = useRef(1);
+
+  const { analysis, analysisLoading, error, interrogation, setDraft } =
+    useStoryPlanner();
+  const { story, refreshAll } = useStory();
   const { user } = useCurrentUser();
 
   const actions = useMemo<PlatformActionItem[]>(
     () => analysis?.translation?.actions ?? [],
-    [analysis?.translation?.actions],
+    [analysis?.translation?.actions]
   );
 
   const questions = useMemo(() => {
@@ -78,24 +92,86 @@ const StoryPlannerLayout = ({ children }: PropsWithChildren) => {
 
   const thinkRef = useRef(null);
 
-  const handleSkip = useCallback(async () => {
-    if (!story?.id) return;
-    await skipStoryOnboarding(story?.id);
-  }, [story]);
+  const completeOnboarding = useCallback(async () => {
+    if (!story?.id) {
+      return;
+    }
 
-  const handleGenerate = () => {
-    void generateStoryboard();
-  };
+    await skipStoryOnboarding(story.id);
+    await onCompleted();
+  }, [onCompleted, story?.id]);
+
+  const handleSkip = useCallback(async () => {
+    if (!story?.id) {
+      return;
+    }
+
+    skipRequestedRef.current = true;
+    await completeOnboarding();
+  }, [completeOnboarding, story?.id]);
+
+  const handleAddToStoryboard = useCallback(
+    async (item: PlatformActionItem) => {
+      if (!story?.id) {
+        return;
+      }
+
+      const actionKey = getPlatformActionKey(item);
+      if (acceptedActionKeys.has(actionKey) || addingActionKey === actionKey) {
+        return;
+      }
+
+      setActionError(null);
+      setAddingActionKey(actionKey);
+
+      try {
+        const order = sceneOrderRef.current;
+        await applyPlatformAction(story.id, item, order);
+
+        if (item.action === PlatformAction.NEW_SCENE) {
+          sceneOrderRef.current += 1;
+        }
+
+        setAcceptedActionKeys((current) => new Set(current).add(actionKey));
+        await refreshAll();
+      } catch (caughtError) {
+        setActionError(
+          caughtError instanceof Error
+            ? caughtError.message
+            : "Unable to add this item to your storyboard."
+        );
+      } finally {
+        setAddingActionKey(null);
+      }
+    },
+    [acceptedActionKeys, addingActionKey, refreshAll, story?.id]
+  );
+
+  const handleContinue = useCallback(() => {
+    pendingCompleteRef.current = true;
+    setIsContinuing(true);
+    setCurrentPageIndex(2);
+  }, []);
+
+  const handleAnimationComplete = useCallback(() => {
+    if (!pendingCompleteRef.current) {
+      return;
+    }
+
+    pendingCompleteRef.current = false;
+    void completeOnboarding();
+  }, [completeOnboarding]);
 
   return (
     <Style.Container>
       <Style.Rail
         animate={{
-          transform: `translateX(calc(66vw * ${-currentPageIndex}))`,
+          transform: `translateX(calc(85vw * ${-currentPageIndex}))`,
         }}
         transition={{
-          duration: 0.75,
+          duration: skipRequestedRef.current ? 0 : 0.75,
         }}
+        onAnimationComplete={handleAnimationComplete}
       >
         <Style.Think>
           <Accordion style={{ height: "100%", gap: 40 }}>
@@ -114,7 +190,7 @@ const StoryPlannerLayout = ({ children }: PropsWithChildren) => {
               />
             </AccordionItem>
             <AccordionItem ref={thinkRef} defaultOpen={true}>
-              <Style.AccordionButton onClick={handleSkip}>
+              <Style.AccordionButton onClick={() => void handleSkip()}>
                 Skip onboarding and just start writing
               </Style.AccordionButton>
             </AccordionItem>
@@ -147,40 +223,57 @@ const StoryPlannerLayout = ({ children }: PropsWithChildren) => {
 
             {!analysisLoading && actions.length > 0 && (
               <Style.ActionList>
-                {actions.map((item) => (
-                  <PlatformPostItem
-                    key={`${item.action}-${item.body.slice(0, 48)}-${item.data.find((field) => field.label.startsWith("#"))?.value ?? ""}`}
-                    action={toPlatformAction(item.action)}
-                    body={item.body}
-                    data={item.data.map((field) => ({
-                      label: field.label,
-                      type: field.type,
-                      value: field.value,
-                    }))}
-                  />
-                ))}
+                {actions.map((item) => {
+                  if (!item) {
+                    return null;
+                  }
+
+                  const actionKey = getPlatformActionKey(item);
+                  const isAccepted = acceptedActionKeys.has(actionKey);
+                  const isAdding = addingActionKey === actionKey;
+                  const canApply = canApplyPlatformAction(item.action);
+
+                  return (
+                    <PlatformPostItem
+                      key={actionKey}
+                      action={toPlatformAction(item.action)}
+                      body={
+                        typeof item.body === "string"
+                          ? item.body
+                          : String(item.body ?? "")
+                      }
+                      data={
+                        (item.data?.map((field) => ({
+                          label: field.label,
+                          type: field.type,
+                          value: field.value,
+                        })) ?? []) as PlatformPostField[]
+                      }
+                      accepted={isAccepted}
+                      onAddToStoryboard={
+                        canApply && !isAccepted && !isAdding
+                          ? () => void handleAddToStoryboard(item)
+                          : undefined
+                      }
+                    />
+                  );
+                })}
               </Style.ActionList>
             )}
 
             {(analysisLoading || error) && error && (
               <Style.ErrorText>{error}</Style.ErrorText>
             )}
+
+            {actionError && <Style.ErrorText>{actionError}</Style.ErrorText>}
           </Style.ExtractBody>
 
           <Style.Actions>
             <Style.PrimaryButton
               type="button"
-              onClick={handleGenerate}
-              disabled={!canGenerate || actions.length === 0}
-              label={
-                awaitingCompletion
-                  ? "Generating storyboard..."
-                  : submitting
-                    ? "Starting..."
-                    : interrogation.thresholdReached
-                      ? "Generate storyboard"
-                      : `Answer at least 3 questions (${analysis.answeredCount}/3)`
-              }
+              onClick={handleContinue}
+              disabled={isContinuing}
+              label={isContinuing ? "Continuing..." : "Continue"}
             />
           </Style.Actions>
         </Style.Extract>
@@ -196,10 +289,16 @@ const StoryPlannerLayout = ({ children }: PropsWithChildren) => {
  * @param {Object} props - The properties object.
  * @returns {JSX.Element} The rendered StoryPlanner component.
  */
-export const StoryPlanner = ({ storyId, onCompleted }: StoryPlannerProps) => {
+export const StoryPlanner = ({
+  storyId,
+  onCompleted,
+  children,
+}: StoryPlannerProps) => {
   return (
     <PlannerProvider storyId={storyId} onCompleted={onCompleted}>
-      <StoryPlannerLayout />
+      <StoryPlannerLayout onCompleted={onCompleted}>
+        {children}
+      </StoryPlannerLayout>
     </PlannerProvider>
   );
 };

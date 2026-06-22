@@ -1,5 +1,5 @@
 "use client";
-import { StoryboardScreen } from "@writersunblocked/ui";
+import { StoryboardScreen } from "@writersunblocked/ui/app";
 import { AnimatePresence } from "motion/react";
 import { type PropsWithChildren, useEffect, useMemo, useState } from "react";
 import { MentionBoard } from "../MentionBoard";

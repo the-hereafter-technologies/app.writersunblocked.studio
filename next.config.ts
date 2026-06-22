@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
   devIndicators: {
@@ -56,6 +57,14 @@ const nextConfig: NextConfig = {
     );
 
     fileLoaderRule.exclude = /\.svg$/i;
+
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "react-hook-form": path.resolve(
+        process.cwd(),
+        "node_modules/react-hook-form"
+      ),
+    };
 
     return config;
   },

@@ -8,15 +8,27 @@ import { cookies } from "next/headers";
  */
 export async function clearAuthCookie(): Promise<void> {
   const cookieStore = await cookies();
+  const isProduction = process.env.NODE_ENV === "production";
+  const domain = process.env.AUTH_COOKIE_DOMAIN;
 
-  // Clear the JWT cookie on the current domain
   cookieStore.delete("jwt");
 
-  // Also attempt to clear on the shared domain (if applicable in production)
-  // The domain-scoped cookie will be automatically cleared when you set maxAge: 0
   cookieStore.set("jwt", "", {
     maxAge: 0,
     path: "/",
-    sameSite: "lax",
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   });
+
+  if (domain) {
+    cookieStore.set("jwt", "", {
+      maxAge: 0,
+      path: "/",
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      domain,
+    });
+  }
 }

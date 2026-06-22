@@ -2868,6 +2868,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@the-hereafter-technologies/writersunblocked-ui@file:.yalc/@the-hereafter-technologies/writersunblocked-ui::locator=%40writersunblocked%2Fapp%40workspace%3A.":
+  version: 0.5.6
+  resolution: "@the-hereafter-technologies/writersunblocked-ui@file:.yalc/@the-hereafter-technologies/writersunblocked-ui#.yalc/@the-hereafter-technologies/writersunblocked-ui::hash=608800&locator=%40writersunblocked%2Fapp%40workspace%3A."
+  dependencies:
+    "@dnd-kit/react": "npm:^0.5.0"
+    "@hookform/resolvers": "npm:^5.2.2"
+    "@tiptap/extension-character-count": "npm:^3.26.0"
+    "@tiptap/extension-text-align": "npm:^3.26.0"
+    "@tiptap/pm": "npm:^3.26.0"
+    "@tiptap/react": "npm:^3.26.0"
+    "@tiptap/starter-kit": "npm:^3.26.0"
+    "@vanilla-extract/recipes": "npm:^0.5.7"
+    embla-carousel-react: "npm:^8.6.0"
+    moment: "npm:^2.30.1"
+    motion: "npm:^12.40.0"
+    nanoid: "npm:^5.1.11"
+    react-intersection-observer: "npm:^10.0.3"
+    react-select: "npm:^5.10.2"
+    yup: "npm:^1.7.1"
+  peerDependencies:
+    next: ">=14"
+    react: ">=18"
+    react-dom: ">=18"
+    react-hook-form: ^7.55.0
+  checksum: 10c0/5b83a56f9b0653427ded91a5490007a379e00c01ad0792d854b51bafba059d63c531c3df8e442871c1c4643052d3f5706fcadd39c931e2228561935493c52bd2
+  languageName: node
+  linkType: hard
+
 "@tiptap/core@npm:^3.22.3":
   version: 3.22.3
   resolution: "@tiptap/core@npm:3.22.3"
@@ -3987,6 +4015,7 @@ __metadata:
     "@hookform/resolvers": "npm:^5.2.2"
     "@storybook/nextjs": "npm:^10.3.6"
     "@svgr/webpack": "npm:^8.1.0"
+    "@the-hereafter-technologies/writersunblocked-ui": "file:.yalc/@the-hereafter-technologies/writersunblocked-ui"
     "@tiptap/core": "npm:^3.22.3"
     "@tiptap/extension-mention": "npm:^3.22.3"
     "@tiptap/pm": "npm:^3.22.3"
@@ -3997,7 +4026,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     "@types/styled-components": "npm:^5.1.36"
-    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@^0.3.0"
+    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@^0.5.7"
     colord: "npm:^2.9.3"
     lucide-react: "npm:^1.8.0"
     moment: "npm:^2.30.1"
@@ -4018,9 +4047,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@writersunblocked/ui@npm:@the-hereafter-technologies/writersunblocked-ui@^0.3.0":
-  version: 0.3.0
-  resolution: "@the-hereafter-technologies/writersunblocked-ui@npm:0.3.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40the-hereafter-technologies%2Fwritersunblocked-ui%2F0.3.0%2Fce5777d3b91117de014f8bfbb11c0f0a22df76fa"
+"@writersunblocked/ui@npm:@the-hereafter-technologies/writersunblocked-ui@^0.5.7":
+  version: 0.5.7
+  resolution: "@the-hereafter-technologies/writersunblocked-ui@npm:0.5.7::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40the-hereafter-technologies%2Fwritersunblocked-ui%2F0.5.7%2F40300cb421b67f8f376316d769c34e649a706309"
   dependencies:
     "@dnd-kit/react": "npm:^0.5.0"
     "@hookform/resolvers": "npm:^5.2.2"
@@ -4030,10 +4059,10 @@ __metadata:
     "@tiptap/react": "npm:^3.26.0"
     "@tiptap/starter-kit": "npm:^3.26.0"
     "@vanilla-extract/recipes": "npm:^0.5.7"
+    embla-carousel-react: "npm:^8.6.0"
     moment: "npm:^2.30.1"
     motion: "npm:^12.40.0"
     nanoid: "npm:^5.1.11"
-    react-hook-form: "npm:^7.76.0"
     react-intersection-observer: "npm:^10.0.3"
     react-select: "npm:^5.10.2"
     yup: "npm:^1.7.1"
@@ -4041,7 +4070,8 @@ __metadata:
     next: ">=14"
     react: ">=18"
     react-dom: ">=18"
-  checksum: 10c0/93cd77f89228160cd7904a274de87755527702a7fd6ccce361c8963e0ff2f33e0a9b8a99316307cee4f5799c905f354c79ecf4f353d66b8a6339d644f4887321
+    react-hook-form: ^7.55.0
+  checksum: 10c0/347606381633dadd3d45ecada372fd5866c03cb7b7d765c9e49f6d0f63f7851aa0ff40fc9a805b01a0f24b6b8a87c253a33d1398abdabf237fa3477f52a43728
   languageName: node
   linkType: hard
 
@@ -5373,6 +5403,34 @@ __metadata:
     minimalistic-assert: "npm:^1.0.1"
     minimalistic-crypto-utils: "npm:^1.0.1"
   checksum: 10c0/8b24ef782eec8b472053793ea1e91ae6bee41afffdfcb78a81c0a53b191e715cbe1292aa07165958a9bbe675bd0955142560b1a007ffce7d6c765bcaf951a867
+  languageName: node
+  linkType: hard
+
+"embla-carousel-react@npm:^8.6.0":
+  version: 8.6.0
+  resolution: "embla-carousel-react@npm:8.6.0"
+  dependencies:
+    embla-carousel: "npm:8.6.0"
+    embla-carousel-reactive-utils: "npm:8.6.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  checksum: 10c0/461b0c427a6fca62e730c7b39d08e9c55b01a2138c173d5b9ebf77ec92092a900b45ac384731c77382b48d5d65946994d3abba6e9899a66d6e16f8ddf191ed1c
+  languageName: node
+  linkType: hard
+
+"embla-carousel-reactive-utils@npm:8.6.0":
+  version: 8.6.0
+  resolution: "embla-carousel-reactive-utils@npm:8.6.0"
+  peerDependencies:
+    embla-carousel: 8.6.0
+  checksum: 10c0/33d07e6df4d8dec9b4fc95858838ea2d5e5df078039c05b2a342c05ba4979d8d18564a1c607da445fed744daf969a0b5a90124ce487a854e86ced6f0458b51e9
+  languageName: node
+  linkType: hard
+
+"embla-carousel@npm:8.6.0":
+  version: 8.6.0
+  resolution: "embla-carousel@npm:8.6.0"
+  checksum: 10c0/f4c598e7be28b70340d31ffd2bebb2472db370b0c81d9b089bf9555cf618695f35dc4a0694565c994c9ab972731123063f945aa09ff485df0df761d79c6a08ef
   languageName: node
   linkType: hard
 
@@ -7879,15 +7937,6 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
   checksum: 10c0/b96fb9c10893fd5b31151c412fe3dd475a207e2ca7e7d41f0b3d98c05e3d6e556b9c2edfb568820fcbf598f257871a87b91c9909cc6e07a7ab7bf6b36e22035a
-  languageName: node
-  linkType: hard
-
-"react-hook-form@npm:^7.76.0":
-  version: 7.79.0
-  resolution: "react-hook-form@npm:7.79.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10c0/d34edf52766b911dd8c7f583ab7345bca60a352ae96cd8cb82e808e7875c36de21b2d4ee0afc40f693e1d98f0b3d6b47929cb873ca39d3b7b54a56cef6a5cb6d
   languageName: node
   linkType: hard
 

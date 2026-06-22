@@ -16,16 +16,14 @@ export interface StoryPageProps {
   storyId: string;
 }
 
-const StoryPageBody = () => {
+const StoryAppLayout = () => {
   const {
     story,
-    refreshAll,
     editorScenes,
     sceneOrganizerValue,
     createSceneForOrganizer,
     handleSceneOrganizerChange,
     updateSceneLabel,
-    isLoading,
   } = useStory();
   const { openBoard } = useStoryboard();
   const router = useRouter();
@@ -53,22 +51,6 @@ const StoryPageBody = () => {
     [router]
   );
 
-  if (isLoading) {
-    return null;
-  }
-
-  if (story && !story.onboardingComplete) {
-    return (
-      <StoryPlanner
-        storyId={story.id}
-        onCompleted={async () => {
-          await refreshAll();
-          openBoard(StoryboardScreen.Scene);
-        }}
-      />
-    );
-  }
-
   if (!user) {
     return null;
   }
@@ -94,11 +76,35 @@ const StoryPageBody = () => {
       <Style.SceneContainer>
         <StoryContent />
       </Style.SceneContainer>
-      {/* <Style.StoryBoardColumn>
-        <BoardPanel />
-      </Style.StoryBoardColumn> */}
     </Style.Container>
   );
+};
+
+const StoryPageBody = () => {
+  const { story, refreshAll, isLoading } = useStory();
+  const { openBoard } = useStoryboard();
+
+  const handleOnboardingComplete = useCallback(async () => {
+    await refreshAll();
+    openBoard(StoryboardScreen.Scene);
+  }, [openBoard, refreshAll]);
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (story && !story.onboardingComplete) {
+    return (
+      <StoryPlanner
+        storyId={story.id}
+        onCompleted={handleOnboardingComplete}
+      >
+        <StoryAppLayout />
+      </StoryPlanner>
+    );
+  }
+
+  return <StoryAppLayout />;
 };
 
 /**

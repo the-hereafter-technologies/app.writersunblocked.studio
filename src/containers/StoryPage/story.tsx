@@ -1,5 +1,7 @@
-import { SceneEditor } from "@writersunblocked/ui";
-import { useCallback, useEffect, useRef, type ComponentProps } from "react";
+import { SceneEditor, EditorMode } from "@writersunblocked/ui/app";
+import { type ComponentProps, useCallback, useEffect, useRef, useState } from "react";
+import { useEditorAnalysis } from "@/hooks/useEditorAnalysis";
+import { useStoryboard } from "@/components/StoryBoard/hooks";
 import { useStory } from "./provider";
 
 type EditorValue = {
@@ -18,9 +20,7 @@ const getAutosaveKey = (sceneId: string) => `scene:${sceneId}`;
 const hashJson = (value: unknown) => JSON.stringify(value ?? null);
 
 const toEditorMode = (mode?: string) =>
-  mode === "screenplay"
-    ? EditorStoryMode.SCREENPLAY
-    : EditorStoryMode.PROSE;
+  mode === "screenplay" ? EditorStoryMode.SCREENPLAY : EditorStoryMode.PROSE;
 
 export const StoryContent = () => {
   const {
@@ -31,8 +31,22 @@ export const StoryContent = () => {
     updateSceneLabel,
     isReadOnly,
   } = useStory();
+  const { openBoard } = useStoryboard();
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.Writing);
   const sceneHashesRef = useRef<Map<string, string>>(new Map());
   const storyIdRef = useRef<string | null>(null);
+
+  const {
+    suggestionItemsBySceneId,
+    isAnalyzing,
+    handleAnalyzeRequest,
+    handleApplyFix,
+    handleLineFeedback,
+  } = useEditorAnalysis({
+    storyId: story?.id,
+    editorMode,
+    disabled: isReadOnly,
+  });
 
   useEffect(() => {
     if (!story) {
@@ -50,7 +64,7 @@ export const StoryContent = () => {
       }
 
       const activeVersion = scene.versions?.find(
-        (version) => version.id === scene.activeVersionId
+        (version: { id?: string }) => version.id === scene.activeVersionId
       );
 
       sceneHashesRef.current.set(scene.id, hashJson(activeVersion?.data));
@@ -95,16 +109,38 @@ export const StoryContent = () => {
     [isReadOnly, updateSceneLabel]
   );
 
+  const handleStoryboardClick = useCallback(() => {
+    openBoard();
+  }, [openBoard]);
+
   const sceneEditorProps = {
     mode: toEditorMode(story?.mode),
     scenes: orderedEditorScenes,
+    editorMode,
+    suggestionItemsBySceneId,
+    isAnalyzing,
+    disabled: isReadOnly,
     onSceneChange: handleSceneChange,
     onSceneTitleChange: handleSceneTitleChange,
+    onModeChange: setEditorMode,
+    onStoryboardClick: handleStoryboardClick,
+    onAnalyzeRequest: handleAnalyzeRequest,
+    onApplyFix: handleApplyFix,
+    onLineFeedback: handleLineFeedback,
   } satisfies {
     mode: "prose" | "screenplay";
     scenes: typeof orderedEditorScenes;
+    editorMode: EditorMode;
+    suggestionItemsBySceneId: typeof suggestionItemsBySceneId;
+    isAnalyzing: boolean;
+    disabled: boolean;
     onSceneChange: typeof handleSceneChange;
     onSceneTitleChange: typeof handleSceneTitleChange;
+    onModeChange: typeof setEditorMode;
+    onStoryboardClick: typeof handleStoryboardClick;
+    onAnalyzeRequest: typeof handleAnalyzeRequest;
+    onApplyFix: typeof handleApplyFix;
+    onLineFeedback: typeof handleLineFeedback;
   };
 
   return (

@@ -1,4 +1,4 @@
-import { StoryboardScreen } from "@writersunblocked/ui";
+import { StoryboardScreen } from "@writersunblocked/ui/app";
 import { createContext } from "react";
 import type { StoryboardContextType } from "./types";
 

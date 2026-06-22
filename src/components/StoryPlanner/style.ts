@@ -1,32 +1,25 @@
 "use client";
-import { Button, Platform } from "@writersunblocked/ui";
+import { Button, Platform } from "@writersunblocked/ui/app";
 import { motion } from "motion/react";
 import Masonry from "react-masonry-css";
 import styled from "styled-components";
 
 export const Container = styled.div`
 	min-height: 100vh;
-	display: grid;
-	grid-template-columns: .65fr 1fr;
+	width: 100vw;
+	overflow: hidden;
 	background: ${({ theme }) => theme.palette.brand.paper};
-  overflow: hidden;
-
-
-	@media (max-width: 980px) {
-		grid-template-columns: 1fr;
-		min-height: auto;
-	}
 `;
 
 export const Rail = styled(motion.div)`
   display: flex;
   align-items: stretch;
   height: 100vh;
+  width: max-content;
+
   > div {
-    width: 90vw;
-    @media ${({ theme }) => theme.media?.lg} {
-      width: 66vw;
-    }
+    width: 85vw;
+    flex-shrink: 0;
   }
 `;
 
@@ -48,8 +41,8 @@ export const AccordionButton = styled.button`
 `;
 
 export const Think = styled.div`
-  width: 500px;
   padding: 40px;
+  background: ${({ theme }) => theme.palette.brand.paper};
 `;
 export const Extract = styled.div`
   background-color: ${({ theme }) => theme.palette.brand.white};
@@ -91,7 +84,10 @@ export const ExtractHeader = styled.div`
   }
 `;
 
-export const Write = styled.div``;
+export const Write = styled.div`
+  min-height: 100vh;
+  overflow: hidden;
+`;
 
 export const InputPane = styled.section`
 	padding: 44px 40px 28px;

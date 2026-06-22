@@ -1,5 +1,5 @@
 "use client";
-import { StoryBarWithMenu } from "@writersunblocked/ui";
+import { StoryBarWithMenu } from "@writersunblocked/ui/app";
 import { motion } from "motion/react";
 import styled from "styled-components";
 

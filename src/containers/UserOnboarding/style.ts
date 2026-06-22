@@ -23,4 +23,19 @@ export const Container = styled(OnboardingPage)`
 	span.available {
 		background-color: green;
 	}
+
+	div.input-container {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		max-width: 500px;
+	}
+	
+	div.with-handle-check {
+		display: flex;
+	}
+
+	.text-field {
+		padding-right: 30px;
+	}
 `;

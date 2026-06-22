@@ -1,7 +1,7 @@
 import { createProject } from "@/services/api/createProject";
 import { useCheckout } from "@/services/hooks/useCheckout";
 import { useCurrentUser } from "@/services/hooks/useCurrentUser";
-import { NewStoryCell } from "@writersunblocked/ui";
+import { NewStoryCell } from "@writersunblocked/ui/app";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { useFormContext } from "react-hook-form";
