@@ -1,19 +1,29 @@
 "use client";
 
-import { deleteAccount, updateName } from "@/services/api/userActions";
+import { deleteAccount, updateHandle, updateName } from "@/services/api/userActions";
 import { useCurrentUser } from "@/services/hooks/useCurrentUser";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
+
+const normalizeHandle = (value: string) =>
+  value.trim().replace(/^@+/, "").toLowerCase();
 
 export default function AccountMePage() {
   const { user, refetch } = useCurrentUser();
   const router = useRouter();
   const [nameValue, setNameValue] = useState("");
+  const [handleValue, setHandleValue] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
+  const [handleError, setHandleError] = useState<string | null>(null);
   const [nameSuccess, setNameSuccess] = useState(false);
+  const [handleSuccess, setHandleSuccess] = useState(false);
+  const [isHandleAvailable, setIsHandleAvailable] = useState<boolean | null>(
+    null
+  );
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isPending, startTransition] = useTransition();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleSaveName = () => {
     const trimmed = nameValue.trim();
@@ -34,6 +44,76 @@ export default function AccountMePage() {
     });
   };
 
+  const handleHandleChange = useCallback(
+    (value: string) => {
+      setHandleValue(value);
+      setHandleError(null);
+      setHandleSuccess(false);
+
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+
+      debounceRef.current = setTimeout(async () => {
+        const normalized = normalizeHandle(value);
+
+        if (!normalized) {
+          setIsHandleAvailable(null);
+          return;
+        }
+
+        if (normalized === user?.handle) {
+          setIsHandleAvailable(true);
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/users/handle-availability?handle=${encodeURIComponent(normalized)}`
+          );
+          const data = (await response.json()) as { available?: boolean };
+          setIsHandleAvailable(Boolean(data.available));
+        } catch {
+          setIsHandleAvailable(null);
+        }
+      }, 400);
+    },
+    [user?.handle]
+  );
+
+  const handleSaveHandle = () => {
+    const normalized = normalizeHandle(handleValue || user?.handle || "");
+
+    if (normalized.length < 3) {
+      setHandleError("Handle must be at least 3 characters.");
+      return;
+    }
+
+    if (!/^[a-z0-9_]{3,30}$/.test(normalized)) {
+      setHandleError(
+        "Handle may only contain lowercase letters, numbers, and underscores."
+      );
+      return;
+    }
+
+    if (normalized !== user?.handle && isHandleAvailable === false) {
+      setHandleError("That handle is already taken.");
+      return;
+    }
+
+    setHandleError(null);
+    startTransition(async () => {
+      try {
+        await updateHandle(normalized);
+        await refetch();
+        setHandleSuccess(true);
+        setTimeout(() => setHandleSuccess(false), 3000);
+      } catch {
+        setHandleError("Failed to save handle. Please try again.");
+      }
+    });
+  };
+
   const handleDeleteAccount = () => {
     if (deleteConfirmText !== "DELETE") return;
     startTransition(async () => {
@@ -48,6 +128,7 @@ export default function AccountMePage() {
   };
 
   const currentName = user?.name ?? "";
+  const currentHandle = user?.handle ?? "";
 
   const sectionStyle: React.CSSProperties = {
     background: "#fff",
@@ -146,16 +227,58 @@ export default function AccountMePage() {
           )}
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+        <div style={{ marginBottom: "1.25rem" }}>
+          <label htmlFor="handle-input" style={labelStyle}>
+            Handle
+          </label>
+          <input
+            id="handle-input"
+            type="text"
+            style={inputStyle}
+            defaultValue={currentHandle}
+            onChange={(e) => handleHandleChange(e.target.value)}
+            placeholder="your_unique_handle"
+          />
+          {handleError && (
+            <p style={{ fontSize: "12px", color: "#ef4444", marginTop: "4px" }}>
+              {handleError}
+            </p>
+          )}
+          {!handleError &&
+            isHandleAvailable === false &&
+            normalizeHandle(handleValue || currentHandle) !== currentHandle && (
+              <p style={{ fontSize: "12px", color: "#ef4444", marginTop: "4px" }}>
+                That handle is already taken.
+              </p>
+            )}
+          <p style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>
+            Used for your profile and community visibility.
+          </p>
+        </div>
+
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginBottom: "1rem" }}>
           <button
             style={{ ...btnStyle, background: "#111827", color: "#fff" }}
             onClick={handleSaveName}
             disabled={isPending}
           >
-            {isPending ? "Saving…" : "Save Changes"}
+            {isPending ? "Saving…" : "Save Name"}
           </button>
           {nameSuccess && (
-            <span style={{ fontSize: "13px", color: "#10b981" }}>Saved!</span>
+            <span style={{ fontSize: "13px", color: "#10b981" }}>Name saved!</span>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <button
+            style={{ ...btnStyle, background: "#111827", color: "#fff" }}
+            onClick={handleSaveHandle}
+            disabled={isPending}
+          >
+            {isPending ? "Saving…" : "Save Handle"}
+          </button>
+          {handleSuccess && (
+            <span style={{ fontSize: "13px", color: "#10b981" }}>Handle saved!</span>
           )}
         </div>
       </section>

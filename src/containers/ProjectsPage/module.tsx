@@ -33,13 +33,6 @@ export const ProjectsPage = async () => {
     cache: "no-store",
   });
   const me = await getMe(cookie);
-  const hasName = Boolean(me.name?.trim());
-  const hasHandle = Boolean(me.handle?.trim());
-
-  if (!hasName || !hasHandle) {
-    redirect(`/onboarding/user/${getOnboardingSessionId()}`);
-  }
-
   const firstName = me.name?.split(" ")[0] ?? "User";
 
   return (

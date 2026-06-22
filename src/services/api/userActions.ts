@@ -12,6 +12,16 @@ export const updateName = async (name: string) => {
   });
 };
 
+export const updateHandle = async (handle: string) => {
+  const cookie = (await headers()).get("cookie");
+  return nestApiRequest<{ id: string; handle: string | null }>({
+    path: "/users/me/handle",
+    method: "PATCH",
+    body: { handle },
+    headers: cookie ? { cookie } : undefined,
+  });
+};
+
 export const updateNotifications = async (
   preferences: Record<string, boolean>
 ) => {
