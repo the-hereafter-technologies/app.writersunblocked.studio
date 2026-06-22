@@ -24,7 +24,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.2.2",
-    "@the-hereafter-technologies/writersunblocked-ui": "file:.yalc/@the-hereafter-technologies/writersunblocked-ui",
     "@tiptap/core": "^3.22.3",
     "@tiptap/extension-mention": "^3.22.3",
     "@tiptap/pm": "^3.22.3",
