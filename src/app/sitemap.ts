@@ -42,11 +42,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
-    {
-      url: `${siteUrl}/signup`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
   ];
 }

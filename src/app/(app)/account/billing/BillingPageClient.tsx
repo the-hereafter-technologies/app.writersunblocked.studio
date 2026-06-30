@@ -1,17 +1,9 @@
 "use client";
 
 import { getCheckoutUrl } from "@/services/api/getCheckoutUrl";
+import type { Offer } from "@/services/hooks/useCheckout";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-
-interface Offer {
-  id: string;
-  name: string;
-  price: string;
-  tier: string;
-  amountCents: number;
-  interval: string;
-}
 
 interface SubscriptionInfo {
   status: string | null;
@@ -23,6 +15,7 @@ interface SubscriptionInfo {
 interface BillingPageClientProps {
   subscription: SubscriptionInfo;
   offers: Offer[];
+  customOffers?: Offer[];
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -44,6 +37,7 @@ const STATUS_COLORS: Record<string, string> = {
 export function BillingPageClient({
   subscription,
   offers,
+  customOffers = [],
 }: BillingPageClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -188,6 +182,54 @@ export function BillingPageClient({
             style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
           >
             {offers.map((offer) => (
+              <div
+                key={offer.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "1rem",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: "14px", fontWeight: 500 }}>
+                    {offer.name}
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#6b7280" }}>
+                    {offer.price}/{offer.interval}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  style={{
+                    ...btnStyle,
+                    background: "#111827",
+                    color: "#fff",
+                  }}
+                  onClick={() => handleUpgrade(offer.id)}
+                  disabled={isPending}
+                >
+                  {isPending ? "Loading…" : "Subscribe"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {customOffers.length > 0 && (
+        <section style={sectionStyle}>
+          <h2
+            style={{ fontSize: "16px", fontWeight: 500, marginBottom: "1rem" }}
+          >
+            VIP & Team Offers
+          </h2>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+          >
+            {customOffers.map((offer) => (
               <div
                 key={offer.id}
                 style={{

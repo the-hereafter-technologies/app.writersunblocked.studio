@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 /**
  * Server function to clear authentication cookies.
- * Call this before redirecting to signup to ensure the user session is completely cleared.
+ * Clears the JWT cookie so the user session is completely removed.
  */
 export async function clearAuthCookie(): Promise<void> {
   const cookieStore = await cookies();

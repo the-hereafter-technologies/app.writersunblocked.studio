@@ -16,7 +16,7 @@ export const MentionItem = ({ mentionId }: MentionItemProps) => {
 
   return (
     <MentionCard
-      name={mention.name}
+      name={mention.label}
       mentionType={mention.type}
       color={mention.color}
       onClick={() => openBoard("mention", mention.id)}

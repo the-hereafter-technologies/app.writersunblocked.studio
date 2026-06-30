@@ -112,7 +112,13 @@ export const StoryOnboarding = ({
         />
       </OnboardingSection>
       <OnboardingSection>
-        <NewStory />
+        <div
+          style={{
+            maxWidth: "25vw",
+          }}
+        >
+          <NewStory />
+        </div>
       </OnboardingSection>
     </Style.Container>
   );

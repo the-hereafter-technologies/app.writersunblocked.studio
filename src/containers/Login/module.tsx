@@ -1,3 +1,4 @@
+import { getMarketingUrl } from "@/lib/marketing-url";
 import Image from "next/image";
 import Link from "next/link";
 import LoginImage from "./image.png";
@@ -6,7 +7,20 @@ import { LoginWithGoogle } from "./login-with-google";
 import * as Style from "./style";
 
 export interface LoginProps {
-  referral?: string;
+  error?: string;
+}
+
+const LOGIN_ERROR_MESSAGES: Record<string, string> = {
+  no_account:
+    "We couldn't find an account for that Google sign-in. Create an account on our website first, then come back to log in.",
+};
+
+function getLoginErrorMessage(error?: string): string | null {
+  if (!error) {
+    return null;
+  }
+
+  return LOGIN_ERROR_MESSAGES[error] ?? "Unable to sign in. Please try again.";
 }
 
 /**
@@ -15,7 +29,10 @@ export interface LoginProps {
  * @param {Object} props - The properties object.
  * @returns {JSX.Element} The rendered Login component.
  */
-export const Login = ({ referral: _referral }: LoginProps) => {
+export const Login = ({ error }: LoginProps) => {
+  const errorMessage = getLoginErrorMessage(error);
+  const marketingUrl = getMarketingUrl();
+
   const toTheUser = [
     "Let's get you back to your stories.",
     "100 words today and you get a biggg hug!",
@@ -31,21 +48,26 @@ export const Login = ({ referral: _referral }: LoginProps) => {
           Welcome back
           <span>{randomMessage}</span>
         </div>
-        <div className="disabled-disclaimed">
-          Email login is temporarily disabled during our early access period.
-          Please continue with your google account by clicking the button below.
-        </div>
+        {errorMessage ? (
+          <div className="login-error" role="alert">
+            {errorMessage}
+          </div>
+        ) : null}
+
         <div>
           <LoginForm />
         </div>
         <div className="login-with">
           <span>Or continue with...</span>
-          <LoginWithGoogle mode="login" />
+          <LoginWithGoogle />
         </div>
         <div style={{ marginTop: "1.25rem", fontSize: "14px" }}>
           Don&apos;t have an account?{" "}
-          <Link href="/signup" style={{ textDecoration: "underline" }}>
-            Sign up here
+          <Link
+            href={`${marketingUrl}/signup`}
+            style={{ textDecoration: "underline" }}
+          >
+            Sign up on writersunblocked.studio
           </Link>
         </div>
       </div>

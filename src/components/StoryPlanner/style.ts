@@ -16,11 +16,6 @@ export const Rail = styled(motion.div)`
   align-items: stretch;
   height: 100vh;
   width: max-content;
-
-  > div {
-    width: 85vw;
-    flex-shrink: 0;
-  }
 `;
 
 export const AccordionButton = styled.button`
@@ -41,10 +36,15 @@ export const AccordionButton = styled.button`
 `;
 
 export const Think = styled.div`
+  width: 85vw;
+  flex-shrink: 0;
   padding: 40px;
   background: ${({ theme }) => theme.palette.brand.paper};
 `;
-export const Extract = styled.div`
+export const Extract = styled.div<{ $visible: boolean }>`
+  width: 85vw;
+  flex-shrink: 0;
+  visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
   background-color: ${({ theme }) => theme.palette.brand.white};
   display: flex;
   flex-direction: column;
@@ -85,6 +85,8 @@ export const ExtractHeader = styled.div`
 `;
 
 export const Write = styled.div`
+  width: 85vw;
+  flex-shrink: 0;
   min-height: 100vh;
   overflow: hidden;
 `;

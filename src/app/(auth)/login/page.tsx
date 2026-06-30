@@ -3,8 +3,8 @@ import { Login } from "@/containers/Login";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ referral?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const { referral } = await searchParams;
-  return <Login referral={referral} />;
+  const { error } = await searchParams;
+  return <Login error={error} />;
 }

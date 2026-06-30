@@ -4,7 +4,7 @@ import { useStoryboard } from "@/components/StoryBoard/hooks";
 import { StoryBoardProvider } from "@/components/StoryBoard/provider";
 import { StoryPlanner } from "@/components/StoryPlanner";
 import { useCurrentUser } from "@/services/hooks/useCurrentUser";
-import { StoryboardScreen } from "@writersunblocked/ui";
+import { StoryboardScreen } from "@writersunblocked/ui/app";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { ObserverProvider } from "./observer";
@@ -95,10 +95,7 @@ const StoryPageBody = () => {
 
   if (story && !story.onboardingComplete) {
     return (
-      <StoryPlanner
-        storyId={story.id}
-        onCompleted={handleOnboardingComplete}
-      >
+      <StoryPlanner storyId={story.id} onCompleted={handleOnboardingComplete}>
         <StoryAppLayout />
       </StoryPlanner>
     );

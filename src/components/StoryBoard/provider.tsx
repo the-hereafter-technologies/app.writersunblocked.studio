@@ -3,6 +3,7 @@ import { StoryboardScreen } from "@writersunblocked/ui/app";
 import { AnimatePresence } from "motion/react";
 import { type PropsWithChildren, useEffect, useMemo, useState } from "react";
 import { MentionBoard } from "../MentionBoard";
+import { PlatformBoard } from "../PlatformBoard";
 import { ProjectBoard } from "../ProjectBoard";
 import { StoryboardHeader } from "./header";
 import * as Style from "./style";
@@ -10,7 +11,7 @@ import { StoryboardContext } from "./utils";
 
 export const StoryBoardProvider = ({ children }: PropsWithChildren) => {
   const [screen, setScreen] = useState<StoryboardScreen>(
-    StoryboardScreen.Scene
+    StoryboardScreen.Story
   );
   const [entityId, setEntityId] = useState<string | null>(null);
   const [isStoryboardOpen, setIsPanelOpen] = useState(false);
@@ -27,7 +28,7 @@ export const StoryBoardProvider = ({ children }: PropsWithChildren) => {
   }, [isStoryboardOpen]);
 
   const openBoard = (screen?: StoryboardScreen, entityId?: string) => {
-    setScreen(screen ?? StoryboardScreen.Scene);
+    setScreen(screen ?? StoryboardScreen.Story);
     setEntityId(entityId ?? null);
     setIsPanelOpen(true);
     console.log("Opening board:", screen, entityId);
@@ -44,8 +45,8 @@ export const StoryBoardProvider = ({ children }: PropsWithChildren) => {
         return <ProjectBoard />;
       case StoryboardScreen.Mention:
         return <MentionBoard mentionId={entityId} />;
-      case StoryboardScreen.Scene:
-        return <div></div>;
+      case StoryboardScreen.Platform:
+        return <PlatformBoard platformId={entityId} />;
       default:
         return null;
     }

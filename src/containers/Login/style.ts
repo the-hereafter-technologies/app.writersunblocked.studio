@@ -67,6 +67,17 @@ export const Container = styled.div`
       object-position: center;
     }
 
+    .login-error {
+      max-width: 487px;
+      margin-bottom: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      background-color: ${({ theme }) => theme.palette.brand.paper};
+      color: ${({ theme }) => theme.palette.brand.black};
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
     .disabled-disclaimed {
       font-size: 11px;
       color: ${({ theme }) => theme.palette.brand.black};
@@ -78,20 +89,10 @@ export const Container = styled.div`
 
 `;
 
-export const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 50px;
+export const FormContainer = styled.div`
 
-  [type="text"] {
-    width: 100%;
-    max-width: 487px;
-    padding: 0.85rem;
-    background-color: ${({ theme }) => theme.palette.brand.paper};
-    border-radius: 10px;
-    cursor: not-allowed;
-  }
+  margin-bottom: 50px;
+  margin-top: 2rem;
 
 `;
 

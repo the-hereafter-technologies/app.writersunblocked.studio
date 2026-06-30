@@ -1,28 +1,24 @@
 "use client";
-import type { Offer } from "@/services/hooks/useCheckout";
+
+import { useCheckout } from "@/services/hooks/useCheckout";
 import { useCurrentUser } from "@/services/hooks/useCurrentUser";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../Button";
 import * as Style from "./style";
 
 export interface UpgradeForAccessProps {
-  offers?: Offer[];
+  tierSlug?: string;
   onUpgrade?: (offerId: string) => void;
   onContinueFree?: () => void;
 }
 
-/**
- * UpgradeForAccess description
- *
- * @param {Object} props - The properties object.
- * @returns {JSX.Element} The rendered UpgradeForAccess component.
- */
 export const UpgradeForAccess = ({
-  offers = [],
+  tierSlug = "starter",
   onUpgrade,
   onContinueFree,
 }: UpgradeForAccessProps) => {
   const { user } = useCurrentUser();
+  const { getEffectiveOffer, isLoading } = useCheckout();
   const [showAnnual, setShowAnnual] = useState(false);
   const [hasReferralBonus, setHasReferralBonus] = useState(false);
 
@@ -33,8 +29,14 @@ export const UpgradeForAccess = ({
     }
   }, []);
 
-  const annualOffer = offers.filter((offer) => offer.interval === "year")[0];
-  const monthlyOffer = offers.filter((offer) => offer.interval === "month")[0];
+  const monthlyOffer = useMemo(
+    () => getEffectiveOffer(tierSlug, "month"),
+    [getEffectiveOffer, tierSlug]
+  );
+  const annualOffer = useMemo(
+    () => getEffectiveOffer(tierSlug, "year"),
+    [getEffectiveOffer, tierSlug]
+  );
 
   const currentOffer = useMemo(() => {
     return showAnnual ? annualOffer : monthlyOffer;
@@ -66,6 +68,10 @@ export const UpgradeForAccess = ({
         <Button label="Create story" type="button" onClick={onContinueFree} />
       </Style.IsSubscriber>
     );
+  }
+
+  if (isLoading) {
+    return null;
   }
 
   return (

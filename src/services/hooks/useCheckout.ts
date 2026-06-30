@@ -2,7 +2,7 @@
 
 import { nestApiRequest } from "@/lib/nest-api";
 import { getCheckoutUrl } from "@/services/api/getCheckoutUrl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface Offer {
   id: string;
@@ -19,10 +19,21 @@ export interface Offer {
   includes?: string[];
 }
 
-export interface UseCheckoutResult {
+export interface SpecialOffer {
+  id: string;
+  label: string;
+  linkedOfferSlug: string;
+  showLabel: boolean;
   offers: Offer[];
+}
+
+export interface UseCheckoutResult {
+  regularOffers: Offer[];
+  specialOffers: SpecialOffer[];
+  customOffers: Offer[];
   isLoading: boolean;
   error: Error | null;
+  getEffectiveOffer: (tierSlug: string, interval: "month" | "year") => Offer | undefined;
   createCheckoutSession: (
     offerId: string,
     successUrl: string,
@@ -31,13 +42,23 @@ export interface UseCheckoutResult {
 }
 
 export const useCheckout = (): UseCheckoutResult => {
-  const [offers, setOffers] = useState<Offer[]>([]);
+  const [regularOffers, setRegularOffers] = useState<Offer[]>([]);
+  const [specialOffers, setSpecialOffers] = useState<SpecialOffer[]>([]);
+  const [customOffers, setCustomOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    nestApiRequest<Offer[]>({ path: "/payments/offers" })
-      .then(setOffers)
+    Promise.all([
+      nestApiRequest<Offer[]>({ path: "/payments/offers" }),
+      nestApiRequest<SpecialOffer[]>({ path: "/payments/special-offers" }),
+      nestApiRequest<Offer[]>({ path: "/payments/custom-offers" }),
+    ])
+      .then(([regular, special, custom]) => {
+        setRegularOffers(regular);
+        setSpecialOffers(special);
+        setCustomOffers(custom);
+      })
       .catch((err: unknown) => {
         setError(
           err instanceof Error ? err : new Error("Failed to load offers")
@@ -45,6 +66,26 @@ export const useCheckout = (): UseCheckoutResult => {
       })
       .finally(() => setIsLoading(false));
   }, []);
+
+  const getEffectiveOffer = useCallback(
+    (tierSlug: string, interval: "month" | "year"): Offer | undefined => {
+      const special = specialOffers.find(
+        (entry) => entry.linkedOfferSlug === tierSlug
+      );
+      const specialMatch = special?.offers.find(
+        (offer) => offer.interval === interval
+      );
+      if (specialMatch) {
+        return specialMatch;
+      }
+
+      return regularOffers.find(
+        (offer) =>
+          offer.tier === tierSlug && offer.interval === interval
+      );
+    },
+    [regularOffers, specialOffers]
+  );
 
   const createCheckoutSession = useCallback(
     async (offerId: string, successUrl: string, cancelUrl: string) => {
@@ -54,5 +95,13 @@ export const useCheckout = (): UseCheckoutResult => {
     []
   );
 
-  return { offers, isLoading, error, createCheckoutSession };
+  return {
+    regularOffers,
+    specialOffers,
+    customOffers,
+    isLoading,
+    error,
+    getEffectiveOffer,
+    createCheckoutSession,
+  };
 };

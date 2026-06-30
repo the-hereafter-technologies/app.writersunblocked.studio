@@ -8,7 +8,7 @@ import {
   type DeleteStoryData,
   PointOfViewInput,
   TenseInput,
-} from "@writersunblocked/ui";
+} from "@writersunblocked/ui/app";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";

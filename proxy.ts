@@ -12,17 +12,11 @@ export default async function proxy(req: NextRequest) {
     "/onboarding",
   ];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
-  const isUserOnboardingRoute = pathname.startsWith("/onboarding/user");
   const hasJwtCookie = Boolean(req.cookies.get("jwt")?.value);
 
   if (isProtected && !hasJwtCookie) {
     const loginUrl = new URL("/login", req.url);
     return NextResponse.redirect(loginUrl);
-  }
-
-  if (hasJwtCookie && isUserOnboardingRoute) {
-    const accountUrl = new URL("/account/me", req.url);
-    return NextResponse.redirect(accountUrl);
   }
 
   return NextResponse.next();

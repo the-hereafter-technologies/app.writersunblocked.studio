@@ -1,5 +1,7 @@
-import { ComponentProps } from "react";
-import * as Style from "./style";
+"use client";
+import { Button as AppButton } from "@writersunblocked/ui/app";
+import { useRouter } from "next/navigation";
+import { type ComponentProps, useCallback } from "react";
 
 export interface ButtonProps extends ComponentProps<"button"> {
   label?: string;
@@ -15,15 +17,23 @@ export interface ButtonProps extends ComponentProps<"button"> {
  * @param {Object} props - The properties object.
  * @returns {JSX.Element} The rendered Button component.
  */
-export const Button = ({ label, arrow, href, ...props }: ButtonProps) => {
-  const Container = href
-    ? ({ ...props }) => <Style.LinkContainer href={href} {...props} />
-    : Style.Container;
-
+export const Button = ({
+  label,
+  arrow,
+  href,
+  onClick,
+  ...props
+}: ButtonProps) => {
+  const router = useRouter();
+  const handleClick = useCallback(
+    (testId?: string) => {
+      if (href) {
+        router.push(href);
+      }
+    },
+    [href, router]
+  );
   return (
-    <Container {...props}>
-      {label}
-      {arrow && <span>→</span>}
-    </Container>
+    <AppButton label={label} arrow={arrow} onClick={handleClick} {...props} />
   );
 };

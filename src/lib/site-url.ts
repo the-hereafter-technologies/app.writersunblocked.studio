@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://writersunblocked.studio";
+const DEFAULT_SITE_URL = "https://app.writersunblocked.studio";
 
 export const getSiteUrl = (): string => {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();

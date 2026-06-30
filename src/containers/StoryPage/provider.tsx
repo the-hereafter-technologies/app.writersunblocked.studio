@@ -3,7 +3,10 @@
 import { connectProgressSocket } from "@/lib/progress-socket";
 import {
   createScene,
+  createMention,
   createStoryboardComment,
+  deleteMention,
+  deleteScene,
   deleteStoryboardComment,
   enqueueSceneAnalysis,
   getMentions,
@@ -45,9 +48,22 @@ import {
   mapApiScenesToStudioScenes,
 } from "./map-scenes";
 import {
+  mapApiMentionToStoryMention,
+  mapStoryMentionToCreatePayload,
+  type ApiMention,
+} from "./map-mention";
+import {
+  buildMentionOrganizerMetadata,
+  EMPTY_MENTION_ORGANIZER_VALUE,
+  parseMentionOrganizerValue,
+  type MentionOrganizerValue,
+} from "./mention-organizer-metadata";
+import {
+  appendSceneRow,
   buildStoryMetadata,
   flattenSceneOrganizerOrder,
   parseSceneOrganizerValue,
+  removeSceneFromOrganizer,
   scenesToInitialValue,
   sortScenesByOrganizerOrder,
   type SceneOrganizerValue,
@@ -74,6 +90,7 @@ interface StoryContextType {
   editorScenes: StoryScene[];
   orderedEditorScenes: StoryScene[];
   sceneOrganizerValue: SceneOrganizerValue;
+  mentionOrganizerValue: MentionOrganizerValue;
   mentions: StoryMention[];
   storyboardComments: StoryboardCommentData[];
   threadTotal: number;
@@ -92,7 +109,17 @@ interface StoryContextType {
     scene: Partial<StoryScene>
   ) => Promise<StoryScene | undefined>;
   handleSceneOrganizerChange: (value: SceneOrganizerValue) => void;
+  handleMentionOrganizerChange: (value: MentionOrganizerValue) => void;
+  createMentionForOrganizer: (
+    draft: Partial<StoryMention>
+  ) => Promise<void>;
+  createGroupForOrganizer: (
+    draft: Omit<StoryMention, "id">
+  ) => Promise<StoryMention | undefined>;
+  removeGroupFromOrganizer: (groupId: string) => Promise<void>;
+  registerSceneInOrganizer: (sceneShortId: string) => void;
   updateSceneLabel: (sceneShortId: string, label: string) => void;
+  removeScene: (sceneId: string) => Promise<void>;
   loadEntities: () => Promise<void>;
   loadThreadCount: () => Promise<void>;
   loadStoryboardComments: () => Promise<void>;
@@ -166,6 +193,8 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
   >({});
   const [sceneOrganizerValue, setSceneOrganizerValue] =
     useState<SceneOrganizerValue>({ rows: [] });
+  const [mentionOrganizerValue, setMentionOrganizerValue] =
+    useState<MentionOrganizerValue>(EMPTY_MENTION_ORGANIZER_VALUE);
 
   const autosaveTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
     new Map()
@@ -175,6 +204,7 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
   );
   const savingSceneIdsRef = useRef<Set<string>>(new Set());
   const hasInitializedOrganizerRef = useRef(false);
+  const hasInitializedMentionOrganizerRef = useRef(false);
 
   const setSaveStatus = useCallback((key: string, next: SaveStatusRecord) => {
     setSaveStatusByKey((current) => ({
@@ -234,7 +264,11 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
 
     try {
       const rows = await getMentions(storyId, { status: "confirmed" });
-      setMentions(Array.isArray(rows) ? rows : []);
+      setMentions(
+        Array.isArray(rows)
+          ? rows.map((row) => mapApiMentionToStoryMention(row as ApiMention))
+          : []
+      );
     } catch {
       setMentions([]);
     }
@@ -611,7 +645,9 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
   );
 
   useEffect(() => {
+    void storyId;
     hasInitializedOrganizerRef.current = false;
+    hasInitializedMentionOrganizerRef.current = false;
   }, [storyId]);
 
   useEffect(() => {
@@ -633,6 +669,16 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
     setSceneOrganizerValue(scenesToInitialValue(editorScenes));
     hasInitializedOrganizerRef.current = true;
   }, [editorScenes, story]);
+
+  useEffect(() => {
+    if (!story || hasInitializedMentionOrganizerRef.current) {
+      return;
+    }
+
+    const savedOrganizer = parseMentionOrganizerValue(story.metadata);
+    setMentionOrganizerValue(savedOrganizer ?? EMPTY_MENTION_ORGANIZER_VALUE);
+    hasInitializedMentionOrganizerRef.current = true;
+  }, [story]);
 
   const createSceneForOrganizer = useCallback(
     async (draft: Partial<StoryScene>) => {
@@ -716,6 +762,103 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
     [isReadOnly, saveSceneOrganizer, scheduleAutosave]
   );
 
+  const saveMentionOrganizer = useCallback(
+    async (value: MentionOrganizerValue) => {
+      if (!storyId || isReadOnly) {
+        return;
+      }
+
+      const metadata = buildMentionOrganizerMetadata(story?.metadata, value);
+      await patchStoryMetadata(storyId, metadata);
+
+      setStory((current) =>
+        current ? { ...current, metadata } : current
+      );
+    },
+    [isReadOnly, story?.metadata, storyId]
+  );
+
+  const handleMentionOrganizerChange = useCallback(
+    (value: MentionOrganizerValue) => {
+      setMentionOrganizerValue(value);
+
+      if (isReadOnly) {
+        return;
+      }
+
+      scheduleAutosave(
+        "mention-organizer",
+        async () => {
+          await saveMentionOrganizer(value);
+        },
+        500
+      );
+    },
+    [isReadOnly, saveMentionOrganizer, scheduleAutosave]
+  );
+
+  const createMentionForOrganizer = useCallback(
+    async (draft: Partial<StoryMention>) => {
+      if (isReadOnly || !storyId || !draft.label || !draft.type) {
+        return;
+      }
+
+      const created = await createMention(
+        storyId,
+        mapStoryMentionToCreatePayload(draft)
+      );
+      const mapped = mapApiMentionToStoryMention(created as ApiMention);
+      setMentions((current) => [...current, mapped]);
+    },
+    [isReadOnly, storyId]
+  );
+
+  const createGroupForOrganizer = useCallback(
+    async (draft: Omit<StoryMention, "id">): Promise<StoryMention | undefined> => {
+      if (isReadOnly || !storyId) {
+        return undefined;
+      }
+
+      const created = await createMention(
+        storyId,
+        mapStoryMentionToCreatePayload({
+          label: draft.label,
+          type: "group",
+          color: draft.color,
+        })
+      );
+      const mapped = mapApiMentionToStoryMention(created as ApiMention);
+      setMentions((current) => [...current, mapped]);
+      return mapped;
+    },
+    [isReadOnly, storyId]
+  );
+
+  const removeGroupFromOrganizer = useCallback(
+    async (groupId: string) => {
+      if (isReadOnly || !storyId) {
+        return;
+      }
+
+      await deleteMention(groupId);
+      setMentions((current) => current.filter((mention) => mention.id !== groupId));
+    },
+    [isReadOnly, storyId]
+  );
+
+  const registerSceneInOrganizer = useCallback(
+    (sceneShortId: string) => {
+      if (flattenSceneOrganizerOrder(sceneOrganizerValue).includes(sceneShortId)) {
+        return;
+      }
+
+      handleSceneOrganizerChange(
+        appendSceneRow(sceneOrganizerValue, sceneShortId)
+      );
+    },
+    [handleSceneOrganizerChange, sceneOrganizerValue]
+  );
+
   const updateSceneLabel = useCallback(
     (sceneShortId: string, label: string) => {
       if (!storyId || isReadOnly) {
@@ -751,6 +894,44 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
     [apiScenes, isReadOnly, loadScenes, scheduleAutosave, storyId]
   );
 
+  const removeScene = useCallback(
+    async (sceneId: string) => {
+      if (!storyId || isReadOnly) {
+        return;
+      }
+
+      const scene = apiScenes.find((entry) => entry.id === sceneId);
+      if (!scene) {
+        return;
+      }
+
+      cancelAutosave(getAutosaveKey("scene", sceneId));
+      cancelAutosave(`scene-title:${scene.shortId}`);
+      cancelAutosave("scene-organizer");
+
+      await deleteScene(storyId, sceneId);
+
+      setApiScenes((current) => current.filter((entry) => entry.id !== sceneId));
+
+      const nextOrganizer = removeSceneFromOrganizer(
+        sceneOrganizerValue,
+        scene.shortId
+      );
+      setSceneOrganizerValue(nextOrganizer);
+      await saveSceneOrganizer(nextOrganizer);
+      await refetchStory();
+    },
+    [
+      apiScenes,
+      cancelAutosave,
+      isReadOnly,
+      refetchStory,
+      saveSceneOrganizer,
+      sceneOrganizerValue,
+      storyId,
+    ]
+  );
+
   const value = useMemo<StoryContextType>(
     () => ({
       storyId,
@@ -759,6 +940,7 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
       editorScenes,
       orderedEditorScenes,
       sceneOrganizerValue,
+      mentionOrganizerValue,
       mentions,
       storyboardComments,
       threadTotal,
@@ -775,7 +957,13 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
       addScene,
       createSceneForOrganizer,
       handleSceneOrganizerChange,
+      handleMentionOrganizerChange,
+      createMentionForOrganizer,
+      createGroupForOrganizer,
+      removeGroupFromOrganizer,
+      registerSceneInOrganizer,
       updateSceneLabel,
+      removeScene,
       loadEntities,
       loadThreadCount,
       loadStoryboardComments,
@@ -796,10 +984,14 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
       cancelAutosave,
       connectionState,
       createSceneForOrganizer,
+      createGroupForOrganizer,
+      createMentionForOrganizer,
       editorScenes,
       error,
       flushAutosave,
+      handleMentionOrganizerChange,
       handleSceneOrganizerChange,
+      registerSceneInOrganizer,
       isLoading,
       isReadOnly,
       lastAnalysisDiagnostic,
@@ -809,6 +1001,7 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
       addScene,
       loadStoryboardComments,
       loadThreadCount,
+      mentionOrganizerValue,
       mentions,
       orderedEditorScenes,
       sceneOrganizerValue,
@@ -831,6 +1024,8 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
       threadTotal,
       triggerReanalyze,
       updateSceneLabel,
+      removeGroupFromOrganizer,
+      removeScene,
     ]
   );
 

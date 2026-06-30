@@ -1,7 +1,7 @@
 import * as Style from "./style";
 
 export interface StoryBoardProps {
-	storyId?: string | null;
+  storyId?: string | null;
 }
 
 /**
@@ -11,10 +11,10 @@ export interface StoryBoardProps {
  * @returns {JSX.Element} The rendered StoryBoard component.
  */
 export const StoryBoard = ({ storyId }: StoryBoardProps) => {
-	return (
-		  <Style.Container>
-  			<h1>StoryBoard</h1>
-  			<p>{storyId ?? "No story selected"}</p>
-  		</Style.Container>
-	);
+  return (
+    <Style.Container>
+      <h1>StoryBoard</h1>
+      <p>{storyId ?? "No story selected"}</p>
+    </Style.Container>
+  );
 };

@@ -47,6 +47,44 @@ export const scenesToInitialValue = (scenes: StoryScene[]): SceneOrganizerValue 
     })),
 });
 
+export const appendSceneRow = (
+  value: SceneOrganizerValue,
+  sceneId: string
+): SceneOrganizerValue => ({
+  rows: [...value.rows, { type: "scene", sceneId }],
+});
+
+export const removeSceneFromOrganizer = (
+  value: SceneOrganizerValue,
+  sceneId: string
+): SceneOrganizerValue => {
+  const rows: SceneOrganizerRow[] = [];
+
+  for (const row of value.rows) {
+    if (row.type === "scene") {
+      if (row.sceneId !== sceneId) {
+        rows.push(row);
+      }
+      continue;
+    }
+
+    const nextSceneIds = row.sceneIds.filter((id) => id !== sceneId);
+
+    if (nextSceneIds.length === 0) {
+      continue;
+    }
+
+    if (nextSceneIds.length === 1) {
+      rows.push({ type: "scene", sceneId: nextSceneIds[0] });
+      continue;
+    }
+
+    rows.push({ ...row, sceneIds: nextSceneIds });
+  }
+
+  return { rows };
+};
+
 export const flattenSceneOrganizerOrder = (value: SceneOrganizerValue): string[] => {
   const shortIds: string[] = [];
 

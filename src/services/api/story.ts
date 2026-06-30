@@ -244,7 +244,7 @@ export interface StoryLocation {
   color?: keyof HighlightBackgroundColors;
 }
 
-export type MentionType = "person" | "place" | "thing";
+export type MentionType = "person" | "place" | "thing" | "group";
 export type MentionStatus = "pending" | "confirmed";
 
 export interface CreateMentionPayload {

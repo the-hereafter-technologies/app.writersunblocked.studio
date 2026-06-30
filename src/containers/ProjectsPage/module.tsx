@@ -1,11 +1,10 @@
 import { Button } from "@/components/Button";
-import { LogoutButton } from "@/components/LogoutButton";
-import { ProjectItem } from "@/components/ProjectItem";
 import { getOnboardingSessionId } from "@/lib/getOnboardingSessionId";
 import { nestApiRequest } from "@/lib/nest-api";
 import { getMe } from "@/services/api/getMe";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ProjectsPageFrame } from "./frame";
 import * as Style from "./style";
 
 interface Story {
@@ -32,37 +31,24 @@ export const ProjectsPage = async () => {
     headers: { cookie },
     cache: "no-store",
   });
+
+  if (data.length === 0) {
+    redirect(`/onboarding/story/${getOnboardingSessionId()}`);
+  }
+
   const me = await getMe(cookie);
-  const firstName = me.name?.split(" ")[0] ?? "User";
 
   return (
     <Style.Container>
-      <h1>
-        Welcome back,
-        <br />
-        {firstName}
-      </h1>
-      <Style.Card>
-        <Style.CardTitle>Your Projects</Style.CardTitle>
-        <Style.ProjectsList>
-          {data.map((story) => (
-            <ProjectItem
-              key={story.id}
-              storyId={story.id}
-              href={`/story/${story.id}`}
-              title={story.title}
-              wordCount={story.wordCount}
-              lastEdited={story.lastEditedAt}
-            />
-          ))}
-        </Style.ProjectsList>
-        <Button
-          label="Create New Project"
-          arrow
-          href={`/onboarding/story/${getOnboardingSessionId()}`}
-        />
-      </Style.Card>
-      <LogoutButton />
+      <ProjectsPageFrame user={me} stories={data}>
+        <Style.FrameItems>
+          <Button
+            label="Create New Story"
+            arrow
+            href={`/onboarding/story/${getOnboardingSessionId()}`}
+          />
+        </Style.FrameItems>
+      </ProjectsPageFrame>
     </Style.Container>
   );
 };

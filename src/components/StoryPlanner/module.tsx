@@ -55,6 +55,7 @@ const StoryPlannerLayout = ({
   onCompleted,
 }: StoryPlannerLayoutProps) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [hasPostedToPlatform, setHasPostedToPlatform] = useState(false);
   const [acceptedActionKeys, setAcceptedActionKeys] = useState<Set<string>>(
     () => new Set()
   );
@@ -66,9 +67,9 @@ const StoryPlannerLayout = ({
   const skipRequestedRef = useRef(false);
   const sceneOrderRef = useRef(1);
 
-  const { analysis, analysisLoading, error, interrogation, setDraft } =
+  const { analysis, analysisLoading, error, interrogation, maxWords, setDraft } =
     useStoryPlanner();
-  const { story, refreshAll } = useStory();
+  const { story, refreshAll, registerSceneInOrganizer } = useStory();
   const { user } = useCurrentUser();
 
   const actions = useMemo<PlatformActionItem[]>(
@@ -126,7 +127,7 @@ const StoryPlannerLayout = ({
 
       try {
         const order = sceneOrderRef.current;
-        await applyPlatformAction(story.id, item, order);
+        const result = await applyPlatformAction(story.id, item, order);
 
         if (item.action === PlatformAction.NEW_SCENE) {
           sceneOrderRef.current += 1;
@@ -134,6 +135,10 @@ const StoryPlannerLayout = ({
 
         setAcceptedActionKeys((current) => new Set(current).add(actionKey));
         await refreshAll();
+
+        if (result.scene?.shortId) {
+          registerSceneInOrganizer(result.scene.shortId);
+        }
       } catch (caughtError) {
         setActionError(
           caughtError instanceof Error
@@ -144,7 +149,7 @@ const StoryPlannerLayout = ({
         setAddingActionKey(null);
       }
     },
-    [acceptedActionKeys, addingActionKey, refreshAll, story?.id]
+    [acceptedActionKeys, addingActionKey, refreshAll, registerSceneInOrganizer, story?.id]
   );
 
   const handleContinue = useCallback(() => {
@@ -183,10 +188,14 @@ const StoryPlannerLayout = ({
               <StoryboardStarter
                 style={{ height: "100%", maxWidth: 740, margin: "0 auto" }}
                 interrogation={questions}
+                maxWords={maxWords}
                 onChange={(data) =>
                   data?.plainText && setDraft(data?.plainText)
                 }
-                onSubmit={() => setCurrentPageIndex(1)}
+                onSubmit={() => {
+                  setHasPostedToPlatform(true);
+                  setCurrentPageIndex(1);
+                }}
               />
             </AccordionItem>
             <AccordionItem ref={thinkRef} defaultOpen={true}>
@@ -196,7 +205,7 @@ const StoryPlannerLayout = ({
             </AccordionItem>
           </Accordion>
         </Style.Think>
-        <Style.Extract>
+        <Style.Extract $visible={hasPostedToPlatform}>
           <Style.ExtractHeader>
             <h1 contentEditable suppressContentEditableWarning>
               {story?.title}

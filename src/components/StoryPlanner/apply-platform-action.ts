@@ -1,8 +1,11 @@
-import { createMention, type MentionType } from "@/services/api/createMention";
-import { createNote } from "@/services/api/createNote";
-import { createScene } from "@/services/api/createScene";
+import {
+  createMention,
+  createScene,
+  type ApiScene,
+} from "@/services/api/story";
 import type { PlatformActionItem } from "@/services/api/story";
-import { PlatformAction, generateShortId } from "@writersunblocked/ui/app";
+import { PlatformAction } from "@writersunblocked/ui/app";
+import { createNote } from "@/services/api/createNote";
 
 const fieldValue = (
   data: PlatformActionItem["data"],
@@ -16,7 +19,9 @@ const fieldValue = (
   return String(value);
 };
 
-const toMentionType = (value?: string): MentionType => {
+const toMentionType = (
+  value?: string
+): "person" | "place" | "thing" => {
   if (value === "place" || value === "thing") {
     return value;
   }
@@ -50,11 +55,15 @@ export const canApplyPlatformAction = (action: string): boolean => {
   );
 };
 
+export type ApplyPlatformActionResult = {
+  scene?: ApiScene;
+};
+
 export const applyPlatformAction = async (
   storyId: string,
   item: PlatformActionItem,
   order: number
-): Promise<void> => {
+): Promise<ApplyPlatformActionResult> => {
   switch (item.action) {
     case PlatformAction.NEW_MENTION: {
       const name = fieldValue(item.data, "#StoryLabel");
@@ -68,20 +77,19 @@ export const applyPlatformAction = async (
         status: "confirmed",
         color: "mist",
       });
-      return;
+      return {};
     }
     case PlatformAction.NEW_SCENE: {
       const title =
         fieldValue(item.data, "Summary") ??
         (toText(item.body).trim() || "Untitled Scene");
 
-      await createScene(storyId, {
+      const scene = await createScene(storyId, {
         title,
-        shortId: generateShortId(),
         order,
         visible: true,
       });
-      return;
+      return { scene };
     }
     case PlatformAction.NEW_NOTE: {
       const body = fieldValue(item.data, "Body") ?? toText(item.body).trim();
@@ -93,7 +101,7 @@ export const applyPlatformAction = async (
         body,
         color: "amber",
       });
-      return;
+      return {};
     }
     default:
       throw new Error(`Unsupported platform action: ${item.action}`);

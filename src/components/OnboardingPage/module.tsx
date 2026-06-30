@@ -1,5 +1,4 @@
 "use client";
-import { useCheckout } from "@/services/hooks/useCheckout";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
 import { Children, type ComponentProps, Fragment, useCallback } from "react";
@@ -33,8 +32,6 @@ export const OnboardingPage = ({
   const params = useParams();
   const onboardingId = params.onboardingId;
   console.log("Onboarding ID:", onboardingId);
-
-  const { offers } = useCheckout();
 
   const Slides = Children.toArray(children);
 

@@ -1,5 +1,5 @@
 import { useStory } from "@/containers/StoryPage";
-import { MentionOrganizer } from "@writersunblocked/ui";
+import { MentionOrganizer } from "@writersunblocked/ui/app";
 import * as Style from "./style";
 
 export type MentionBoardProps = {
@@ -12,25 +12,37 @@ export type MentionBoardProps = {
  * @param {Object} props - The properties object.
  * @returns {JSX.Element} The rendered MentionBoard component.
  */
-export const MentionBoard = ({ mentionId }: MentionBoardProps) => {
-  const { mentions } = useStory();
+export const MentionBoard = ({ mentionId: _mentionId }: MentionBoardProps) => {
+  const {
+    mentions,
+    mentionOrganizerValue,
+    handleMentionOrganizerChange,
+    createMentionForOrganizer,
+    createGroupForOrganizer,
+    removeGroupFromOrganizer,
+  } = useStory();
 
-  const mention = mentions.find((m) => m.id === mentionId) ?? mentions[0];
+  // if (mentions.length === 0) {
+  //   return (
+  //     <Style.Container>
+  //       <Style.EmptyState>
+  //         No mentions yet. Add a mention or highlight text in your story to create
+  //         one.
+  //       </Style.EmptyState>
+  //     </Style.Container>
+  //   );
+  // }
 
   return (
     <Style.Container>
-      <Style.StoryMentions>
-        <Style.MentionList>
-          <MentionOrganizer mentions={mentions} />
-        </Style.MentionList>
-        {/* {mentions.length > 0 ? (
-          
-        ) : (
-          <Style.EmptyState>
-            No mentions yet. Highlight text in your story to create a mention.
-          </Style.EmptyState>
-        )} */}
-      </Style.StoryMentions>
+      <MentionOrganizer
+        mentions={mentions}
+        value={mentionOrganizerValue}
+        onChange={handleMentionOrganizerChange}
+        onAddMention={createMentionForOrganizer}
+        onCreateGroup={createGroupForOrganizer}
+        onRemoveGroup={removeGroupFromOrganizer}
+      />
     </Style.Container>
   );
 };

@@ -60,6 +60,10 @@ const nextConfig: NextConfig = {
 
     config.resolve.alias = {
       ...config.resolve.alias,
+      "framer-motion": path.resolve(
+        process.cwd(),
+        "node_modules/framer-motion"
+      ),
       "react-hook-form": path.resolve(
         process.cwd(),
         "node_modules/react-hook-form"

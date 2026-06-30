@@ -1,7 +1,13 @@
-import { SceneEditor, EditorMode } from "@writersunblocked/ui/app";
-import { type ComponentProps, useCallback, useEffect, useRef, useState } from "react";
-import { useEditorAnalysis } from "@/hooks/useEditorAnalysis";
 import { useStoryboard } from "@/components/StoryBoard/hooks";
+import { useEditorAnalysis } from "@/hooks/useEditorAnalysis";
+import { EditorMode, SceneEditor } from "@writersunblocked/ui/app";
+import {
+  type ComponentProps,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useStory } from "./provider";
 
 type EditorValue = {
@@ -29,6 +35,7 @@ export const StoryContent = () => {
     scheduleAutosave,
     saveScene,
     updateSceneLabel,
+    removeScene,
     isReadOnly,
   } = useStory();
   const { openBoard } = useStoryboard();
@@ -109,6 +116,17 @@ export const StoryContent = () => {
     [isReadOnly, updateSceneLabel]
   );
 
+  const handleSceneDelete = useCallback(
+    (sceneId: string) => {
+      if (isReadOnly) {
+        return;
+      }
+
+      void removeScene(sceneId);
+    },
+    [isReadOnly, removeScene]
+  );
+
   const handleStoryboardClick = useCallback(() => {
     openBoard();
   }, [openBoard]);
@@ -122,6 +140,7 @@ export const StoryContent = () => {
     disabled: isReadOnly,
     onSceneChange: handleSceneChange,
     onSceneTitleChange: handleSceneTitleChange,
+    onSceneDelete: handleSceneDelete,
     onModeChange: setEditorMode,
     onStoryboardClick: handleStoryboardClick,
     onAnalyzeRequest: handleAnalyzeRequest,
@@ -136,6 +155,7 @@ export const StoryContent = () => {
     disabled: boolean;
     onSceneChange: typeof handleSceneChange;
     onSceneTitleChange: typeof handleSceneTitleChange;
+    onSceneDelete: typeof handleSceneDelete;
     onModeChange: typeof setEditorMode;
     onStoryboardClick: typeof handleStoryboardClick;
     onAnalyzeRequest: typeof handleAnalyzeRequest;
@@ -145,6 +165,8 @@ export const StoryContent = () => {
 
   return (
     <SceneEditor
+      hideModes={[EditorMode.Developmental, EditorMode.Scene]}
+      hideActions={["header-two", "header-three", "paragraph", "header"]}
       {...(sceneEditorProps as ComponentProps<typeof SceneEditor>)}
     />
   );

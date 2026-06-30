@@ -96,3 +96,27 @@ export const ProjectItem = styled(Link)`
   }
 
 `;
+
+export const FrameContent = styled.div`
+  width: 100%;
+`;
+
+export const FrameContainer = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+`;
+
+export const FrameItems = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 95vw;
+  margin: 0 auto;
+  padding-top: 2rem;
+  @media ${({ theme }) => theme.media?.lg} {
+    max-width: 55vw;
+
+  }
+`;

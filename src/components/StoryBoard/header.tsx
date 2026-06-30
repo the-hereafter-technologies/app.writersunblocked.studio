@@ -4,7 +4,7 @@ import { useCurrentUser } from "@/services/hooks/useCurrentUser";
 import {
   StoryboardNavigator,
   type StoryboardScreen,
-} from "@writersunblocked/ui";
+} from "@writersunblocked/ui/app";
 import { useStoryboard } from "./hooks";
 import * as Styled from "./style";
 export const StoryboardHeader = ({ screen }: { screen: StoryboardScreen }) => {
@@ -19,6 +19,7 @@ export const StoryboardHeader = ({ screen }: { screen: StoryboardScreen }) => {
         onClose={closeBoard}
         fromTier={user?.subscription?.tier}
         trialing={user?.subscription?.subscriptionStatus === "trialing"}
+        disabled={["scene", "connection", "simulator", "notes", "outline"]}
       />
     </Styled.PanelHeader>
   );
