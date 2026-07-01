@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "prebuild": "node ../writersunblocked-storybook/scripts/ensure-npm-ui.mjs",
+    "prebuild": "node ./ensure-npm-ui.mjs",
     "build": "next build --webpack",
     "start": "next start --webpack",
     "lint": "biome lint",
