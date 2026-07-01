@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "packages": {
-    "@the-hereafter-technologies/writersunblocked-ui": {
-      "signature": "6ca81029aa90cfa7219806951cdc5771",
-      "file": true
-    }
-  }
-}

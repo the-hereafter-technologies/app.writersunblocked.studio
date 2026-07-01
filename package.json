@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "prebuild": "node ../writersunblocked-storybook/scripts/ensure-npm-ui.mjs",
     "build": "next build --webpack",
     "start": "next start --webpack",
     "lint": "biome lint",
@@ -31,7 +32,7 @@
     "@tiptap/react": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
     "@tiptap/suggestion": "^3.22.3",
-    "@writersunblocked/ui": "portal:.yalc/@the-hereafter-technologies/writersunblocked-ui",
+    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@0.5.8",
     "colord": "^2.9.3",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.8.0",
