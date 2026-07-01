@@ -15,8 +15,6 @@ export const NewStory = () => {
   const router = useRouter();
   const { createCheckoutSession } = useCheckout();
 
-  console.log(user?.subscription);
-
   const onComplete = useCallback(
     async (data: StoryOnboardingFormValues, selectedOfferId: string | null) => {
       const project = await createProject({

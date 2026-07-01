@@ -68,7 +68,7 @@ export const StoryOnboarding = ({
       onComplete={handleComplete}
     >
       <OnboardingSection
-        title="Start a new project"
+        title="Begin a new story"
         subtitle="This time you'll finish."
         validateBeforeContinue={["title"]}
       >

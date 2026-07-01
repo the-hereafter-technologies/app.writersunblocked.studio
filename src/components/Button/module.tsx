@@ -27,11 +27,12 @@ export const Button = ({
   const router = useRouter();
   const handleClick = useCallback(
     (testId?: string) => {
+      onClick?.(testId);
       if (href) {
         router.push(href);
       }
     },
-    [href, router]
+    [href, onClick, router]
   );
   return (
     <AppButton label={label} arrow={arrow} onClick={handleClick} {...props} />

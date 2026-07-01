@@ -85,7 +85,7 @@ export const OnboardingSection = Object.assign(
       if (isLastSlide) return false;
       return true;
     }, [isLastSlide, isCurrentPage]);
-    console.log(errors);
+
     return (
       <AnimatePresence>
         <Style.Container className="slide">
