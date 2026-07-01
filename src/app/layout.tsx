@@ -32,12 +32,22 @@ export default function RootLayout({
 }) {
   return (
     <Suspense>
-      <html lang="en">
+      <html
+        lang="en"
+        data-gramm="false"
+        data-gramm_editor="false"
+        data-enable-grammarly="false"
+      >
         <head>
           <GoogleTagManager.Head />
           <meta name="grammarly" content="false" />
         </head>
-        <body>
+        <body
+          spellCheck={false}
+          data-gramm="false"
+          data-gramm_editor="false"
+          data-enable-grammarly="false"
+        >
           <GoogleTagManager.Body />
           <StyledComponentsRegistry>
             <Root>{children}</Root>

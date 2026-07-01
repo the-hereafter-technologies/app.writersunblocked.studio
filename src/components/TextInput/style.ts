@@ -1,4 +1,5 @@
 "use client";
+import { spellcheckGuardAttrs } from "@/lib/spellcheck-guard";
 import styled, { css } from "styled-components";
 import { Label } from "../Label";
 
@@ -17,6 +18,7 @@ export const TextCaption = styled.span`
 
 export const TextField = styled.div.attrs({
 	contentEditable: true,
+	...spellcheckGuardAttrs,
 })<{ $empty?: boolean; $placeholder?: string }>`
   padding: 0;
   border: none;

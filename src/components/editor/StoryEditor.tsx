@@ -1443,6 +1443,9 @@ export default function StoryEditor({
         spellcheck: "false",
         autocorrect: "off",
         autocapitalize: "off",
+        "data-gramm": "false",
+        "data-gramm_editor": "false",
+        "data-enable-grammarly": "false",
         "data-placeholder":
           storyMode === "screenplay"
             ? "Begin your screenplay... add mentions as highlighted nouns."

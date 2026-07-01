@@ -207,12 +207,26 @@ const StoryPlannerLayout = ({
         </Style.Think>
         <Style.Extract $visible={hasPostedToPlatform}>
           <Style.ExtractHeader>
-            <h1 contentEditable suppressContentEditableWarning>
+            <h1
+              contentEditable
+              suppressContentEditableWarning
+              spellCheck={false}
+              data-gramm="false"
+              data-gramm_editor="false"
+              data-enable-grammarly="false"
+            >
               {story?.title}
             </h1>
             <h2>
               by{" "}
-              <span contentEditable suppressContentEditableWarning>
+              <span
+                contentEditable
+                suppressContentEditableWarning
+                spellCheck={false}
+                data-gramm="false"
+                data-gramm_editor="false"
+                data-enable-grammarly="false"
+              >
                 {story?.penName ?? user?.name}
               </span>
             </h2>

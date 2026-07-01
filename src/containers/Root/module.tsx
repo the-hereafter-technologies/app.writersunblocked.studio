@@ -1,5 +1,6 @@
 "use client";
 
+import { SpellcheckGuard } from "@/components/SpellcheckGuard/module";
 import { Main, Theme } from "@/theme"
 import { Modal } from "@writersunblocked/ui"
 import type { PropsWithChildren } from "react"
@@ -13,6 +14,7 @@ import type { PropsWithChildren } from "react"
 export const Root = ({ children }: PropsWithChildren) => {
   return (
     <Theme theme={Main}>
+      <SpellcheckGuard />
       <Modal>
         {children}
       </Modal>
