@@ -1,6 +1,9 @@
 export const SPELLCHECK_GUARD_SELECTOR =
   'input, textarea, [contenteditable=""], [contenteditable="true"]';
 
+export const EDITOR_BLOCK_SELECTOR =
+  '[contenteditable="true"] p, [contenteditable=""] p, [contenteditable="true"] [data-type], [contenteditable=""] [data-type]';
+
 export const spellcheckGuardAttrs = {
   spellCheck: false,
   autoCorrect: "off",
@@ -35,4 +38,5 @@ export function applySpellcheckGuardToTree(root: ParentNode) {
   }
 
   root.querySelectorAll(SPELLCHECK_GUARD_SELECTOR).forEach(applySpellcheckGuard);
+  root.querySelectorAll(EDITOR_BLOCK_SELECTOR).forEach(applySpellcheckGuard);
 }

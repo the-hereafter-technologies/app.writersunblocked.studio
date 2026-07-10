@@ -3343,7 +3343,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     "@types/styled-components": "npm:^5.1.36"
-    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@0.5.8"
+    "@writersunblocked/ui": "npm:@the-hereafter-technologies/writersunblocked-ui@0.5.9"
     colord: "npm:^2.9.3"
     framer-motion: "npm:^12.40.0"
     lucide-react: "npm:^1.8.0"
@@ -3365,15 +3365,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@writersunblocked/ui@npm:@the-hereafter-technologies/writersunblocked-ui@0.5.8":
-  version: 0.5.8
-  resolution: "@the-hereafter-technologies/writersunblocked-ui@npm:0.5.8::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40the-hereafter-technologies%2Fwritersunblocked-ui%2F0.5.8%2Faa8c47d438cff393b5e264bce09dfcdc18790ffb"
+"@writersunblocked/ui@npm:@the-hereafter-technologies/writersunblocked-ui@0.5.9":
+  version: 0.5.9
+  resolution: "@the-hereafter-technologies/writersunblocked-ui@npm:0.5.9::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40the-hereafter-technologies%2Fwritersunblocked-ui%2F0.5.9%2F9d61e6b7e76302f48444d0b8e086d9e7d6177293"
   peerDependencies:
     next: ">=14"
     react: ">=18"
     react-dom: ">=18"
     react-hook-form: ^7.55.0
-  checksum: 10c0/8f46e6027f9a9048a5326b79ebdf98872f97a593a4a80f27434ff0e72cf3b3f14c53abd8347dd931f274e7a21ecc3a8d07fb20b6698223af97c19aa485b4593c
+  checksum: 10c0/d5415b514a72ab94afce131d3a5ed59dbdfab0c6e29b02de840d23133818fa11e38e2a4a23c18ce99424ba17171e5caa770b6c32011080b6de13a00d7205cde9
   languageName: node
   linkType: hard
 

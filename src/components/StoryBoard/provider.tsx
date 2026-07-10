@@ -2,6 +2,7 @@
 import { StoryboardScreen } from "@writersunblocked/ui/app";
 import { AnimatePresence } from "motion/react";
 import { type PropsWithChildren, useEffect, useMemo, useState } from "react";
+import { useStory } from "@/containers/StoryPage";
 import { MentionBoard } from "../MentionBoard";
 import { PlatformBoard } from "../PlatformBoard";
 import { ProjectBoard } from "../ProjectBoard";
@@ -10,6 +11,7 @@ import * as Style from "./style";
 import { StoryboardContext } from "./utils";
 
 export const StoryBoardProvider = ({ children }: PropsWithChildren) => {
+  const { story } = useStory();
   const [screen, setScreen] = useState<StoryboardScreen>(
     StoryboardScreen.Story
   );
@@ -46,11 +48,11 @@ export const StoryBoardProvider = ({ children }: PropsWithChildren) => {
       case StoryboardScreen.Mention:
         return <MentionBoard mentionId={entityId} />;
       case StoryboardScreen.Platform:
-        return <PlatformBoard platformId={entityId} />;
+        return <PlatformBoard storyId={story?.id} />;
       default:
         return null;
     }
-  }, [screen, entityId]);
+  }, [screen, story?.id]);
 
   return (
     <StoryboardContext.Provider

@@ -2,18 +2,21 @@
 
 import { connectProgressSocket } from "@/lib/progress-socket";
 import {
+  analyzeSceneIntelligence,
+  getIntelligenceThreads,
+} from "@/services/api/intelligence";
+import { connectIntelligenceSocket } from "@/services/sockets/intelligence.socket";
+import {
   createScene,
   createMention,
   createStoryboardComment,
   deleteMention,
   deleteScene,
   deleteStoryboardComment,
-  enqueueSceneAnalysis,
   getMentions,
   getScenes,
   getStory,
   getStoryboardComments,
-  getThreads,
   patchSceneContent,
   patchScene,
   patchStory,
@@ -280,7 +283,7 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
     }
 
     try {
-      const data = await getThreads(storyId);
+      const data = await getIntelligenceThreads(storyId);
       setThreadTotal(Array.isArray(data) ? data.length : 0);
     } catch {
       setThreadTotal(0);
@@ -495,7 +498,9 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
       }
 
       const queued = await Promise.all(
-        currentScenes.map((scene) => enqueueSceneAnalysis(scene.id))
+        currentScenes.map((scene) =>
+          analyzeSceneIntelligence(storyId, scene.id)
+        )
       );
 
       if (queued.some((job) => job.queued)) {
@@ -537,47 +542,46 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
       return;
     }
 
-    const reasonMap: Record<string, string> = {
-      success: "threads created",
-      no_reference_occurrences: "no persisted references for block",
-      references_below_threshold: "references below confidence threshold",
+    const diagnosticMap: Record<string, string> = {
+      empty_extraction: "no extractable content",
       analyzer_returned_empty: "analyzer returned no thread payloads",
-      threads_filtered_by_confidence:
-        "thread candidates filtered by confidence",
+      threads_filtered_by_confidence: "thread candidates filtered by confidence",
+      duplicate_content: "content unchanged since last analysis",
+      analyzer_failed: "analysis failed",
     };
 
-    const socket: Socket | null = connectProgressSocket(storyId, {
-      onBlockAnalyzed: async (event) => {
-        const reason = event.diagnostics?.reason;
-        const reasonLabel = reason
-          ? (reasonMap[reason] ?? reason)
+    const intelligenceSocket = connectIntelligenceSocket(storyId, {
+      onAnalysisComplete: async (event) => {
+        const totalThreads = event.threadsCreated + event.threadsUpdated;
+        const diagnosticLabel = event.diagnostic
+          ? (diagnosticMap[event.diagnostic] ?? event.diagnostic)
           : "analysis complete";
 
         setQueueMessage(
-          `Analysis complete: ${event.threadsCreated} threads updated`
+          `Analysis complete: ${totalThreads} thread${totalThreads === 1 ? "" : "s"} updated`
         );
-        setLastAnalysisDiagnostic(
-          `Block ${event.blockId.slice(-6)}: ${reasonLabel}${
-            event.diagnostics
-              ? ` (refs ${event.diagnostics.totalOccurrences}, selected ${
-                  event.diagnostics.selectedOccurrences
-                }, extracted ${event.diagnostics.extractionCount})`
-              : ""
-          }`
-        );
+
+        const sceneLabel = event.sceneId
+          ? apiScenes.find((scene) => scene.id === event.sceneId)?.label ??
+            event.sceneId.slice(-6)
+          : "story";
+
+        setLastAnalysisDiagnostic(`Scene "${sceneLabel}": ${diagnosticLabel}`);
 
         await Promise.all([loadEntities(), loadThreadCount()]);
       },
       onError: (message) => {
-        setQueueMessage(`Realtime disconnected: ${message}`);
+        setQueueMessage(`Intelligence realtime disconnected: ${message}`);
       },
       onStatusChange: (state) => {
         setConnectionState(state);
-        // Clear the disconnection message when reconnected
         if (state === "connected") {
           setQueueMessage(null);
         }
       },
+    });
+
+    const progressSocket: Socket | null = connectProgressSocket(storyId, {
       onStoryboardCommentCreated: () => {
         void loadStoryboardComments();
       },
@@ -603,9 +607,11 @@ export const StoryProvider = ({ children, storyId }: StoryProviderProps) => {
     });
 
     return () => {
-      socket?.disconnect();
+      intelligenceSocket?.disconnect();
+      progressSocket?.disconnect();
     };
   }, [
+    apiScenes,
     loadEntities,
     loadScenes,
     loadStoryboardComments,
